@@ -1,534 +1,285 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>시나모롤 단어 게임</title>
-  <style>
-    :root {
-      --bg1: #ffeefd;
-      --bg2: #f5f3ff;
-      --bg3: #e9f9ff;
-      --card: #ffffff;
-      --ink: #3d3556;
-      --sub: #7a7591;
-      --pri: #ff8bc2;
-      --pri-dark: #ee6db0;
-      --ok: #2f9e67;
-      --no: #d45d7b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 56%, var(--bg3) 100%);
-      color: var(--ink);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .app {
-      width: 100%;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
-    .panel {
-      background: rgba(255,255,255,0.92);
-      border-radius: 0;
-      overflow: hidden;
-      box-shadow: none;
-      min-height: 100vh;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: calc(14px + env(safe-area-inset-top)) 18px 18px;
-      background: linear-gradient(90deg, #ffd9f0 0%, #e7e5ff 50%, #dbf5ff 100%);
-    }
-    .title-small { color: #b35390; font-size: 12px; font-weight: 900; letter-spacing: .04em; }
-    h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.2; }
-    .sub { color: var(--sub); margin-top: 8px; font-size: 14px; }
-    .hero { display: flex; align-items: center; gap: 10px; background: white; border-radius: 20px; padding: 10px 14px; }
-    .avatar {
-      width: 62px; height: 62px; border-radius: 50%; background: #eaf8ff;
-      display: grid; place-items: center; overflow: hidden;
-    }
-    .avatar img { width: 100%; height: 100%; object-fit: contain; display: block; padding: 2px; }
-    .avatar-fallback { font-size: 30px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>시나모롤 스펠링 게임</title>
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --primary: #f07eb8;
+        --primary-dark: #c84d8c;
+        --text: #2d3250;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--text); }
+      .container { max-width: 920px; margin: 0 auto; padding: 18px; }
+      .header {
+        background: linear-gradient(90deg, #f8dff1, #dff2ff);
+        border-radius: 16px; padding: 16px;
+        display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      }
+      .title { margin: 0; font-size: 32px; }
+      .subtitle { margin: 6px 0 0; color: #4b5270; }
+      .hero {
+        width: 110px; height: 110px; border-radius: 14px; background: #fff;
+        border: 2px solid #e7ecff; object-fit: contain; padding: 8px;
+      }
 
-    .content { padding: 16px; }
-    .grid { display: grid; grid-template-columns: 1.25fr .85fr; gap: 14px; }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 14px;
-      box-shadow: 0 10px 24px rgba(171, 143, 188, 0.14);
-    }
-    .card h2 { margin: 0 0 10px; font-size: 21px; }
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
-    .stat { background: #fff7fd; border-radius: 16px; padding: 10px; text-align: center; }
-    .stat .label { color: #6d8497; font-size: 12px; }
-    .stat .value { margin-top: 4px; font-size: 24px; font-weight: 900; }
-    .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { background: #ffeaf6; color: #9f4c7e; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: 800; }
+      .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-top: 14px; }
+      .card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: 0 6px 18px rgba(27,39,94,.08); }
+      .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+      .chip { background: #eef2ff; border-radius: 999px; padding: 7px 12px; font-weight: 700; }
+      .hintLabel { font-size: 13px; color: #4f648a; letter-spacing: 1px; font-weight: 700; }
+      .hint { background: #eff8ff; border-radius: 12px; padding: 18px; margin: 8px 0 12px; font-size: 30px; font-weight: 800; text-align: center; }
+      .input { width: 100%; border: 2px solid #d8e1f4; border-radius: 12px; font-size: 28px; padding: 10px 12px; }
 
-    .btn-row, .btn-3 {
-      display: grid; gap: 10px; margin-top: 14px;
-    }
-    .btn-row { grid-template-columns: 1fr 1fr; }
-    .btn-3 { grid-template-columns: repeat(3,1fr); }
-    button {
-      border: 0; border-radius: 16px; padding: 14px 12px;
-      font-size: 18px; font-weight: 900;
-      background: var(--pri); color: #fff; cursor: pointer;
-      min-height: 54px;
-      box-shadow: 0 6px 0 var(--pri-dark);
-    }
-    button:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--pri-dark); }
-    button.secondary { background: #efeaff; color: #6d56a6; box-shadow: 0 6px 0 #d8cff6; }
-    button.outline { background: #fff; color: #2d7299; border: 1.5px solid #cfe6f5; }
-    button:disabled { opacity: .45; cursor: not-allowed; }
+      .btn {
+        width: 100%; border: none; border-radius: 12px; background: var(--primary);
+        color: white; font-size: 22px; font-weight: 700; padding: 12px; margin-top: 12px; cursor: pointer;
+      }
+      .btn:hover { background: var(--primary-dark); }
+      .btn.secondary { background: #b1c5ff; }
 
-    .note { color: #70889b; font-size: 13px; }
-    .empty { background: #f8fbfd; border-radius: 14px; padding: 12px; text-align: center; color: #6e8596; }
-    .history-item { background: #f8fbfd; border-radius: 14px; padding: 12px; margin-bottom: 8px; }
+      .feedback { min-height: 30px; margin-top: 8px; font-weight: 700; }
+      .ok { color: #0f8b4c; }
+      .bad { color: #c03245; }
 
-    .test-wrap { max-width: 720px; margin: 0 auto; }
-    .topline { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .badge { background: #ffe7f5; color: #9f4c7e; border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 900; }
-    .qbox { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 12px 30px rgba(110,145,175,.16); }
-    .meaning-label { text-align: center; color: #4ba0d4; letter-spacing: .22em; font-size: 12px; font-weight: 900; margin-bottom: 8px; }
-    .meaning {
-      min-height: 120px;
-      border-radius: 22px;
-      background: #f8fbfd;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 22px;
-      font-size: 30px;
-      line-height: 1.35;
-      font-weight: 900;
-      margin-bottom: 14px;
-    }
-    label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 800; color: #5b7284; }
-    input, textarea {
-      width: 100%; border: 1.5px solid #d7e7f3; border-radius: 16px;
-      padding: 16px; font-family: inherit; outline: none; background: #fff;
-    }
-    input { font-size: 30px; font-weight: 900; }
-    textarea { min-height: 240px; font-size: 14px; line-height: 1.55; resize: vertical; }
+      .stickers { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 10px; }
+      .sticker {
+        border: 1px solid #dce6ff; border-radius: 10px; min-height: 112px;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        gap: 6px; background: #fafcff; padding: 8px;
+      }
+      .sticker img { width: 72px; height: 72px; object-fit: contain; }
+      .lock { color: #9ca9c6; font-size: 28px; }
+      .small { font-size: 12px; color: #5f6f8f; }
+      .notice { margin-top: 10px; font-size: 12px; color: #5e6c86; line-height: 1.4; }
 
-    .perfect {
-      background: linear-gradient(90deg, #ebfbff 0%, #fff 100%);
-      border-radius: 22px;
-      padding: 18px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .perfect .emoji { font-size: 56px; }
-    .answer-item { background: white; border-radius: 16px; padding: 12px; box-shadow: 0 7px 18px rgba(110,145,175,.1); margin-bottom: 10px; }
-    .mini { font-size: 12px; color: #7d90a0; font-weight: 900; text-transform: uppercase; }
-    .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
-    .box { border-radius: 12px; padding: 10px; font-weight: 800; }
-    .ok { background: #eafaf0; color: var(--ok); }
-    .no { background: #fff0f2; color: var(--no); }
-    .blue { background: #eef8ff; color: #2d6b92; }
-
-    @media (max-width: 760px) {
-      .grid, .stats, .btn-row, .btn-3, .answer-grid { grid-template-columns: 1fr; }
-      h1 { font-size: 24px; }
-      .meaning { font-size: 25px; }
-      input { font-size: 26px; }
-      button { font-size: 20px; }
-    }
-  </style>
-</head>
-<body>
-  <main class="app">
-    <section class="panel">
-      <header class="header">
+      @media (max-width: 760px) {
+        .grid { grid-template-columns: 1fr; }
+        .hint { font-size: 24px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
         <div>
-          <div class="title-small">CINNAMOROLL WORD GAME</div>
-          <h1>시나모롤 스펠링 게임 ✨</h1>
-          <div class="sub">영어 뜻을 보고 단어 스펠링을 적어요! (7세 맞춤)</div>
+          <p style="margin:0;font-weight:700;color:#8a4f8d;">CINNAMOROLL WORD GAME</p>
+          <h1 class="title">시나모롤 스펠링 게임 ✨</h1>
+          <p class="subtitle">영어 뜻을 보고 단어 스펠링을 적어요! (7세 맞춤)</p>
         </div>
-        <div class="hero">
-          <div id="headerAvatar" class="avatar"></div>
-          <div>
-            <div class="title-small">FAVORITE CHARACTER</div>
-            <div style="font-size:20px;font-weight:900;">Cinnamoroll</div>
-            <div class="note">퍼펙트면 반짝 스티커 선물! 🌟</div>
+        <img id="heroImage" class="hero" src="./public/stickers/sticker_01.png" alt="시나모롤" />
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="stats">
+            <span id="progress" class="chip">문제 1 / 10</span>
+            <span id="stars" class="chip">⭐ 0</span>
+            <span id="draws" class="chip">뽑기 0회</span>
+          </div>
+
+          <div class="hintLabel">ENGLISH MEANING</div>
+          <div id="hint" class="hint"></div>
+
+          <label for="answer" style="font-weight:700;">뜻을 보고 영어 스펠링 써 보세요</label>
+          <input id="answer" class="input" placeholder="여기에 입력" autocomplete="off" />
+          <button id="checkBtn" type="button" class="btn">정답 확인</button>
+          <button id="nextBtn" type="button" class="btn secondary">다음 문제</button>
+          <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin-top:0;">🎁 스티커 뽑기</h2>
+          <p style="margin:6px 0;">별 1개 모으면 뽑기 1번!</p>
+          <button id="drawBtn" type="button" class="btn">뽑기 하기</button>
+          <div id="drawFeedback" class="feedback"></div>
+
+          <h3 style="margin:12px 0 8px;">내 스티커북</h3>
+          <div id="stickerGrid" class="stickers"></div>
+
+          <div class="notice">
+            이미지 파일은 <code>public/stickers/sticker_01.png</code> ~ <code>sticker_07.png</code>로 넣어주세요.<br />
+            (jpg/jpeg/webp도 자동 인식)
           </div>
         </div>
-      </header>
-      <section id="app" class="content"></section>
-    </section>
-  </main>
+      </div>
+    </div>
 
-  <script>
-    const FALLBACK_IMAGE = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-        <rect width="240" height="240" rx="32" fill="#eaf8ff"/>
-        <text x="120" y="110" text-anchor="middle" font-size="74">☁️</text>
-        <text x="120" y="160" text-anchor="middle" font-size="16" fill="#2d7299" font-family="sans-serif" font-weight="700">Cinnamoroll</text>
-      </svg>
-    `);
-    const DEFAULT_CHARACTER_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Cinnamoroll_character.svg/512px-Cinnamoroll_character.svg.png';
+    <script>
+      const words = [
+        { word: 'dust lane', hint: 'dark lines of dust in a galaxy' },
+        { word: 'core', hint: 'the central part of something' },
+        { word: 'galaxy', hint: 'a huge system of stars, gas, and dust held together by gravity' },
+        { word: 'halo', hint: 'a faint outer region around a galaxy' },
+        { word: 'pair', hint: 'two things that go together' },
+        { word: 'isolated', hint: 'separate and alone' },
+        { word: 'dim', hint: 'not bright' },
+        { word: 'edge', hint: 'the outer border of something' },
+        { word: 'luminous', hint: 'giving off light; shining' },
+        { word: 'speck', hint: 'a very small spot' }
+      ];
 
-    const DEFAULT_WORDS = [
-      { word: 'dust lane', meaning: 'dark lines of dust in a galaxy' },
-      { word: 'core', meaning: 'the central part of something' },
-      { word: 'galaxy', meaning: 'a huge system of stars, gas, and dust held together by gravity' },
-      { word: 'halo', meaning: 'a faint outer region around a galaxy' },
-      { word: 'pair', meaning: 'two things that go together' },
-      { word: 'isolated', meaning: 'separate and alone' },
-      { word: 'dim', meaning: 'not bright' },
-      { word: 'edge', meaning: 'the outer border of something' },
-      { word: 'luminous', meaning: 'giving off light; shining' },
-      { word: 'speck', meaning: 'a very small spot' },
-    ];
+      const stickerIds = [1, 2, 3, 4, 5, 6, 7].map(n => `sticker_${String(n).padStart(2, '0')}`);
+      const extCandidates = ['png', 'jpg', 'jpeg', 'webp'];
 
-    const STICKERS = [
-      { id: 'cloud', emoji: '☁️', name: 'Cloud Sticker' },
-      { id: 'star', emoji: '⭐', name: 'Star Sticker' },
-      { id: 'heart', emoji: '💙', name: 'Heart Sticker' },
-      { id: 'moon', emoji: '🌙', name: 'Moon Sticker' },
-      { id: 'sparkle', emoji: '✨', name: 'Sparkle Sticker' },
-    ];
-
-    const STORAGE = {
-      stickers: 'kid-voca-stickers-v1',
-      history: 'kid-voca-history-v1',
-      words: 'kid-voca-words-v2',
-      characterImage: 'kid-voca-character-image-v1',
-    };
-
-    const state = {
-      screen: 'home',
-      savedWords: load(STORAGE.words, DEFAULT_WORDS),
-      stickers: load(STORAGE.stickers, []),
-      history: load(STORAGE.history, []),
-      questions: [],
-      results: [],
-      index: 0,
-      inputValue: '',
-      earnedSticker: null,
-      draftWords: '',
-      characterImage: load(STORAGE.characterImage, DEFAULT_CHARACTER_IMAGE),
-    };
-
-    function load(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function save(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function normalizeText(v) {
-      return String(v || '').toLowerCase().trim().replace(/\s+/g, ' ');
-    }
-
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function randomSticker() {
-      return STICKERS[Math.floor(Math.random() * STICKERS.length)];
-    }
-
-    function characterHTML(size = 'avatar') {
-      return `<div class="${size}">${imageTag()}</div>`;
-    }
-
-    function imageTag() {
-      return `<img src="${state.characterImage}" alt="Cinnamoroll" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';">`;
-    }
-
-    function setCharacterImageFromFile(input) {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = String(reader.result || '');
-        if (!result.startsWith('data:image/')) return;
-        state.characterImage = result;
-        save(STORAGE.characterImage, state.characterImage);
-        render();
+      const ui = {
+        progress: document.getElementById('progress'),
+        stars: document.getElementById('stars'),
+        draws: document.getElementById('draws'),
+        hint: document.getElementById('hint'),
+        answer: document.getElementById('answer'),
+        feedback: document.getElementById('feedback'),
+        drawFeedback: document.getElementById('drawFeedback'),
+        stickerGrid: document.getElementById('stickerGrid'),
+        heroImage: document.getElementById('heroImage')
       };
-      reader.readAsDataURL(file);
-    }
 
-    function resetCharacterImage() {
-      state.characterImage = DEFAULT_CHARACTER_IMAGE;
-      save(STORAGE.characterImage, state.characterImage);
-      render();
-    }
+      const state = { current: 0, stars: 0, solved: {}, collected: [] };
 
-    function setHeaderCharacter() {
-      const root = document.getElementById('headerAvatar');
-      if (!root) return;
-      root.innerHTML = imageTag();
-    }
-
-    function focusInput() {
-      setTimeout(() => {
-        const el = document.getElementById('answerInput');
-        if (el) el.focus();
-      }, 50);
-    }
-
-    function goHome() {
-      state.screen = 'home';
-      render();
-    }
-
-    function startTest(words) {
-      state.questions = shuffle(words);
-      state.results = [];
-      state.index = 0;
-      state.inputValue = '';
-      state.earnedSticker = null;
-      state.screen = 'test';
-      render();
-      focusInput();
-    }
-
-    function startReview() {
-      const wrong = state.results.filter(x => !x.correct).map(x => ({ word: x.word, meaning: x.meaning }));
-      if (wrong.length === 0) return;
-      startTest(wrong);
-    }
-
-    function checkAnswer() {
-      const q = state.questions[state.index];
-      if (!q) return;
-      const correct = normalizeText(state.inputValue) === normalizeText(q.word);
-      state.results.push({ word: q.word, meaning: q.meaning, answer: state.inputValue, correct });
-      state.inputValue = '';
-
-      if (state.index === state.questions.length - 1) {
-        const score = state.results.filter(r => r.correct).length;
-        const perfect = score === state.results.length;
-        state.history.unshift({ id: Date.now(), date: new Date().toLocaleString(), total: state.results.length, score, perfect });
-        state.history = state.history.slice(0, 20);
-        save(STORAGE.history, state.history);
-
-        if (perfect) {
-          state.earnedSticker = randomSticker();
-          state.stickers.unshift(state.earnedSticker);
-          save(STORAGE.stickers, state.stickers);
+      async function firstExistingImage(id) {
+        for (const ext of extCandidates) {
+          const url = `./public/stickers/${id}.${ext}`;
+          try {
+            const res = await fetch(url, { method: 'HEAD' });
+            if (res.ok) return url;
+          } catch {}
         }
-        state.screen = 'result';
-      } else {
-        state.index += 1;
+        return null;
       }
-      render();
-      focusInput();
-    }
 
-    function openEditor() {
-      state.draftWords = state.savedWords.map(w => `${w.word} | ${w.meaning}`).join('\n');
-      state.screen = 'edit';
-      render();
-    }
-
-    function saveWordList() {
-      const parsed = state.draftWords
-        .split('\n')
-        .map(line => line.trim())
-        .filter(Boolean)
-        .map(line => {
-          const [word, ...rest] = line.split('|');
-          if (!word || rest.length === 0) return null;
-          const meaning = rest.join('|').trim();
-          if (!meaning) return null;
-          return { word: word.trim(), meaning };
-        })
-        .filter(Boolean);
-
-      if (parsed.length > 0) {
-        state.savedWords = parsed;
-        save(STORAGE.words, parsed);
+      function saveState() {
+        localStorage.setItem('voca-kids-state', JSON.stringify(state));
       }
-      goHome();
-    }
 
-    function resetDefault() {
-      state.savedWords = [...DEFAULT_WORDS];
-      save(STORAGE.words, state.savedWords);
-      goHome();
-    }
+      function loadState() {
+        const raw = localStorage.getItem('voca-kids-state');
+        if (!raw) return;
+        try {
+          const parsed = JSON.parse(raw);
+          state.current = parsed.current || 0;
+          state.stars = parsed.stars || 0;
+          state.solved = parsed.solved || {};
+          state.collected = parsed.collected || [];
+        } catch {}
+      }
 
-    function renderHome() {
-      const perfectCount = state.history.filter(x => x.perfect).length;
-      const stickers = state.stickers.length
-        ? `<div class="chip-wrap">${state.stickers.map(s => `<div class="chip">${s.emoji} ${escapeHtml(s.name)}</div>`).join('')}</div>`
-        : `<div class="empty">퍼펙트를 하면 스티커를 받을 수 있어요!</div>`;
+      function setFeedback(target, msg, ok) {
+        target.textContent = msg;
+        target.className = `feedback ${ok ? 'ok' : 'bad'}`;
+      }
 
-      const history = state.history.length
-        ? state.history.map(h => `
-            <div class="history-item">
-              <div style="font-weight:900;font-size:17px;">${h.score} / ${h.total}</div>
-              <div class="note">${escapeHtml(h.date)}</div>
-            </div>
-          `).join('')
-        : `<div class="empty">아직 기록이 없어요.</div>`;
+      function renderHeader() {
+        ui.progress.textContent = `문제 ${state.current + 1} / ${words.length}`;
+        ui.stars.textContent = `⭐ ${state.stars}`;
+        ui.draws.textContent = `뽑기 ${state.stars}회`;
+      }
 
-      return `
-        <div class="grid">
-          <div>
-            <div class="card">
-              <h2>오늘의 테스트 💖</h2>
-              <div class="stats">
-                <div class="stat"><div class="label">단어 수</div><div class="value">${state.savedWords.length}</div></div>
-                <div class="stat"><div class="label">퍼펙트</div><div class="value">${perfectCount}</div></div>
-                <div class="stat"><div class="label">스티커</div><div class="value">${state.stickers.length}</div></div>
-              </div>
-              <div class="chip-wrap">
-                ${state.savedWords.map(w => `<div class="chip">${escapeHtml(w.word)}</div>`).join('')}
-              </div>
-              <div class="btn-row">
-                <button onclick="startTest(state.savedWords)">게임 시작 🚀</button>
-                <button class="secondary" onclick="openEditor()">단어 수정 ✏️</button>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="card">
-              <h2>받은 스티커 🎀</h2>
-              ${stickers}
-            </div>
-            <div class="card" style="margin-top:14px;">
-              <h2>최근 점수 📘</h2>
-              ${history}
-            </div>
-          </div>
-        </div>
-      `;
-    }
+      function renderQuestion() {
+        if (state.current >= words.length) state.current = 0;
+        ui.hint.textContent = words[state.current].hint;
+        ui.answer.value = '';
+        setFeedback(ui.feedback, '', true);
+        renderHeader();
+      }
 
-    function renderTest() {
-      const q = state.questions[state.index];
-      return `
-      <div class="test-wrap">
-        <div class="topline">
-          <div class="badge">문제 ${state.index + 1} / ${state.questions.length}</div>
-          <button class="outline" style="min-height:42px;font-size:14px;" onclick="goHome()">나가기</button>
-        </div>
-        <div class="qbox">
-          ${characterHTML('avatar')}
-          <div class="meaning-label">ENGLISH MEANING</div>
-          <div class="meaning">${escapeHtml(q.meaning)}</div>
-          <label for="answerInput">뜻을 보고 영어 스펠링을 써 보세요</label>
-          <input id="answerInput" value="${escapeHtml(state.inputValue)}" oninput="state.inputValue=this.value" onkeydown="if(event.key==='Enter'){checkAnswer();}" placeholder="여기에 입력" autocapitalize="none" autocomplete="off" autocorrect="off" spellcheck="false" />
-          <div style="margin-top:12px;"><button style="width:100%" onclick="checkAnswer()">정답 확인</button></div>
-        </div>
-      </div>`;
-    }
+      function normalize(value) {
+        return value.trim().toLowerCase().replace(/\s+/g, ' ');
+      }
 
-    function renderResult() {
-      const score = state.results.filter(x => x.correct).length;
-      const wrong = state.results.length - score;
-      const sheet = state.results.map(r => `
-        <div class="answer-item">
-          <div class="mini">뜻</div>
-          <div style="font-weight:900;font-size:18px;">${escapeHtml(r.meaning)}</div>
-          <div class="answer-grid">
-            <div><div class="mini">내 답</div><div class="box ${r.correct ? 'ok' : 'no'}">${r.answer ? escapeHtml(r.answer) : '—'}</div></div>
-            <div><div class="mini">정답</div><div class="box blue">${escapeHtml(r.word)}</div></div>
-          </div>
-        </div>`).join('');
+      function checkAnswer() {
+        const user = normalize(ui.answer.value);
+        const q = words[state.current];
+        const answer = normalize(q.word);
 
-      return `
-      <div>
-        ${state.earnedSticker ? `<div class="perfect"><div class="emoji">${state.earnedSticker.emoji}</div><div style="font-size:34px;font-weight:900;color:#2f8bbc;">Perfect!</div><div style="font-weight:800">새 스티커: ${escapeHtml(state.earnedSticker.name)}</div></div>` : ''}
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-            <div>
-              <div class="title-small">RESULT</div>
-              <div style="font-size:42px;font-weight:900;">${score} / ${state.results.length}</div>
-            </div>
-            <div class="stats" style="margin:0;max-width:420px;width:100%;">
-              <div class="stat"><div class="label">정답</div><div class="value" style="color:var(--ok)">${score}</div></div>
-              <div class="stat"><div class="label">오답</div><div class="value" style="color:var(--no)">${wrong}</div></div>
-              <div class="stat"><div class="label">스티커</div><div class="value">${state.stickers.length}</div></div>
-            </div>
-          </div>
-        </div>
-        <div class="btn-3">
-          <button onclick="startTest(state.savedWords)">한 번 더</button>
-          <button class="secondary" onclick="startReview()" ${wrong === 0 ? 'disabled' : ''}>틀린 문제 복습</button>
-          <button class="outline" onclick="goHome()">홈으로</button>
-        </div>
-        <div class="card" style="margin-top:14px;">
-          <h2>정답지</h2>
-          ${sheet}
-        </div>
-      </div>`;
-    }
+        if (!user) {
+          setFeedback(ui.feedback, '먼저 단어를 입력해 주세요.', false);
+          return;
+        }
 
-    function renderEdit() {
-      return `
-      <div style="max-width:760px;margin:0 auto;">
-        <div class="card">
-          <h2>단어장 수정</h2>
-          <div class="empty" style="text-align:left;">
-            한 줄에 하나씩 입력하고 <b>word | meaning</b> 형식으로 저장하세요.<br>
-            예) <code>apple | 사과</code>
-          </div>
-          <div class="empty" style="text-align:left; margin-top:10px;">
-            시나모롤 이미지를 똑같이 쓰고 싶으면 아래에서 원하는 사진 파일을 선택하세요.
-            <div style="margin-top:8px;">
-              <input type="file" accept="image/*" onchange="setCharacterImageFromFile(this)" />
-            </div>
-            <div style="margin-top:8px;">
-              <button class="outline" style="min-height:42px; font-size:14px;" onclick="resetCharacterImage()">기본 이미지로 되돌리기</button>
-            </div>
-          </div>
-          <textarea oninput="state.draftWords=this.value">${escapeHtml(state.draftWords)}</textarea>
-          <div class="btn-3">
-            <button onclick="saveWordList()">저장</button>
-            <button class="secondary" onclick="resetDefault()">기본값 복원</button>
-            <button class="outline" onclick="goHome()">취소</button>
-          </div>
-        </div>
-      </div>`;
-    }
+        if (user === answer) {
+          setFeedback(ui.feedback, `정답! "${q.word}" ⭐ 1개 획득`, true);
+          if (!state.solved[state.current]) {
+            state.solved[state.current] = true;
+            state.stars += 1;
+          }
+          renderHeader();
+          saveState();
+          return;
+        }
 
-    function render() {
-      const root = document.getElementById('app');
-      if (state.screen === 'home') root.innerHTML = renderHome();
-      if (state.screen === 'test') root.innerHTML = renderTest();
-      if (state.screen === 'result') root.innerHTML = renderResult();
-      if (state.screen === 'edit') root.innerHTML = renderEdit();
-      setHeaderCharacter();
-    }
+        setFeedback(ui.feedback, `아쉬워요! 정답은 "${q.word}"`, false);
+      }
 
-    state.draftWords = state.savedWords.map(w => `${w.word} | ${w.meaning}`).join('\n');
-    render();
-  </script>
-</body>
+      function nextQuestion() {
+        state.current = (state.current + 1) % words.length;
+        saveState();
+        renderQuestion();
+      }
+
+      function drawSticker() {
+        if (state.stars < 1) {
+          setFeedback(ui.drawFeedback, '별이 부족해요. 정답을 맞혀서 별을 모아보세요!', false);
+          return;
+        }
+
+        const remaining = stickerIds.filter(id => !state.collected.includes(id));
+        if (!remaining.length) {
+          setFeedback(ui.drawFeedback, '모든 스티커를 모았어요! 🎉', true);
+          return;
+        }
+
+        state.stars -= 1;
+        const picked = remaining[Math.floor(Math.random() * remaining.length)];
+        state.collected.push(picked);
+
+        setFeedback(ui.drawFeedback, `${picked} 획득! (중복 없이 저장됨)`, true);
+        saveState();
+        renderHeader();
+        renderStickerGrid();
+      }
+
+      async function renderStickerGrid() {
+        ui.stickerGrid.innerHTML = '';
+        for (const id of stickerIds) {
+          const cell = document.createElement('div');
+          cell.className = 'sticker';
+
+          if (state.collected.includes(id)) {
+            const imgPath = await firstExistingImage(id);
+            if (imgPath) {
+              cell.innerHTML = `<img src="${imgPath}" alt="${id}" /><div class="small">${id}</div>`;
+            } else {
+              cell.innerHTML = `<div class="lock">🖼️</div><div class="small">${id} (파일 없음)</div>`;
+            }
+          } else {
+            cell.innerHTML = `<div class="lock">🔒</div><div class="small">잠김</div>`;
+          }
+
+          ui.stickerGrid.appendChild(cell);
+        }
+      }
+
+      async function setupHeroImage() {
+        const img = await firstExistingImage('sticker_01');
+        if (img) ui.heroImage.src = img;
+      }
+
+      document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+      document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+      document.getElementById('drawBtn').addEventListener('click', drawSticker);
+      ui.answer.addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkAnswer();
+      });
+
+      loadState();
+      renderQuestion();
+      renderHeader();
+      renderStickerGrid();
+      setupHeroImage();
+    </script>
+  </body>
 </html>
