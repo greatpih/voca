@@ -76,6 +76,25 @@
       .sticker{border:1px solid #dce6ff;border-radius:10px;min-height:112px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;background:#fafcff;padding:8px}
       .sticker img{width:72px;height:72px;object-fit:contain}
       .lock{color:#9ca9c6;font-size:28px}.small{font-size:12px;color:#5f6f8f}
+      .sticker.clickable{cursor:pointer;transition:transform .18s ease}
+      .sticker.clickable:hover{transform:translateY(-2px) scale(1.02)}
+
+      .fullscreen{
+        position:fixed;inset:0;z-index:50;background:rgba(25,10,56,.88);
+        display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px;
+      }
+      .fullscreen.hidden{display:none}
+      .fullscreenCard{
+        width:min(92vw,520px);height:min(72vh,520px);border-radius:28px;
+        background:linear-gradient(180deg,#ff92d7,#cf40a6);
+        border:4px solid #ffd5f0;
+        box-shadow:0 0 44px rgba(255,206,245,.88),0 0 110px rgba(255,255,255,.35);
+        display:flex;align-items:center;justify-content:center;padding:20px;
+      }
+      .fullscreenCard img{width:100%;height:100%;object-fit:contain}
+      .fullscreenTitle{margin:14px 0 2px;color:#fff;font-size:28px;font-weight:900;text-align:center}
+      .fullscreenSub{margin:0 0 12px;color:#ffe8f9;text-align:center}
+      .fullscreenActions{width:min(92vw,420px)}
       @media (max-width:760px){.hint{font-size:24px}.userGrid{grid-template-columns:1fr}.chestStage{width:260px}.chest{width:220px;height:220px;font-size:90px}}
     </style>
   </head>
@@ -135,7 +154,6 @@
           </div>
           <div id="drawFeedback" class="feedback"></div>
           <div class="small">상자가 열리면 위에 스티커가 크게 나타나요</div>
-          <button id="showBookBtn" class="btn hidden" type="button">스티커북 확인하기</button>
           <button id="backToResultBtn" class="btn secondary" type="button">결과 페이지로 돌아가기</button>
         </div>
       </section>
@@ -149,6 +167,16 @@
         <h2 style="margin-top:0;">내 스티커북</h2>
         <div id="stickerGrid" class="stickers"></div>
         <button id="backToDrawBtn" class="btn secondary" type="button">뽑기 페이지로 돌아가기</button>
+      </section>
+
+      <section id="fullscreenModal" class="fullscreen hidden">
+        <div id="modalCard" class="fullscreenCard"></div>
+        <h3 id="modalTitle" class="fullscreenTitle">스티커 획득!</h3>
+        <p id="modalSub" class="fullscreenSub">화면을 가득 채운 스티커를 확인해 보세요</p>
+        <div class="fullscreenActions">
+          <button id="modalPrimaryBtn" class="btn" type="button">모으기</button>
+          <button id="modalCloseBtn" class="btn secondary" type="button">닫기</button>
+        </div>
       </section>
     </div>
 
@@ -189,12 +217,17 @@
         drawFeedback: document.getElementById('drawFeedback'),
         stickerFloat: document.getElementById('stickerFloat'),
         drawBox: document.getElementById('drawBox'),
-        showBookBtn: document.getElementById('showBookBtn'),
         stickerGrid: document.getElementById('stickerGrid'),
         bookUser: document.getElementById('bookUser'),
         bookStars: document.getElementById('bookStars'),
         bookCount: document.getElementById('bookCount'),
-        heroImage: document.getElementById('heroImage')
+        heroImage: document.getElementById('heroImage'),
+        fullscreenModal: document.getElementById('fullscreenModal'),
+        modalCard: document.getElementById('modalCard'),
+        modalTitle: document.getElementById('modalTitle'),
+        modalSub: document.getElementById('modalSub'),
+        modalPrimaryBtn: document.getElementById('modalPrimaryBtn'),
+        modalCloseBtn: document.getElementById('modalCloseBtn')
       };
 
       const state = {
@@ -326,6 +359,8 @@
           item.className = 'sticker';
           if (state.collected.includes(id)) {
             const path = await firstExistingImage(id);
+            item.classList.add('clickable');
+            item.dataset.stickerId = id;
             item.innerHTML = path
               ? `<img src="${path}" alt="${id}" /><div class="small">${id}</div>`
               : `<div class="lock">🖼️</div><div class="small">${id} (파일 없음)</div>`;
@@ -344,6 +379,26 @@
         ui.stickerFloat.classList.add('show');
       }
 
+      async function openFullscreenSticker(id, options = {}) {
+        const { title = `${id} 획득!`, sub = '스티커를 화면에서 크게 확인해 보세요', primaryLabel = '닫기', onPrimary } = options;
+        const path = await firstExistingImage(id);
+        ui.modalCard.innerHTML = path
+          ? `<img src="${path}" alt="${id}" />`
+          : `<div class="lock" style="font-size:120px;">🖼️</div>`;
+        ui.modalTitle.textContent = title;
+        ui.modalSub.textContent = sub;
+        ui.modalPrimaryBtn.textContent = primaryLabel;
+        ui.modalPrimaryBtn.onclick = () => {
+          closeFullscreenSticker();
+          if (onPrimary) onPrimary();
+        };
+        ui.fullscreenModal.classList.remove('hidden');
+      }
+
+      function closeFullscreenSticker() {
+        ui.fullscreenModal.classList.add('hidden');
+      }
+
       async function openChest() {
         if (state.totalStars < 1) {
           setFeedback(ui.drawFeedback, '별이 부족해요. 라운드를 먼저 완료해 주세요!', false);
@@ -352,7 +407,6 @@
         const remaining = stickerIds.filter((id) => !state.collected.includes(id));
         if (!remaining.length) {
           setFeedback(ui.drawFeedback, '모든 스티커를 이미 모았어요! 🎉', true);
-          ui.showBookBtn.classList.remove('hidden');
           return;
         }
 
@@ -370,9 +424,18 @@
         ui.drawBox.classList.remove('opening');
         ui.drawBox.classList.add('burst');
         setTimeout(() => ui.drawBox.classList.remove('burst'), 420);
-        ui.showBookBtn.classList.remove('hidden');
         setFeedback(ui.drawFeedback, `${picked} 획득! 이제 스티커북에서 확인해 보세요.`, true);
         renderDrawHeader();
+        openFullscreenSticker(picked, {
+          title: `${picked} 획득!`,
+          sub: '모으기 버튼을 누르면 스티커북으로 이동해요',
+          primaryLabel: '모으기',
+          onPrimary: async () => {
+            await renderStickerGrid();
+            renderDrawHeader();
+            showPage('book');
+          }
+        });
       }
 
       async function setHeroImage() {
@@ -394,17 +457,23 @@
       document.getElementById('nextRoundBtn').addEventListener('click', startRound);
       document.getElementById('goDrawBtn').addEventListener('click', () => {
         showPage('draw');
-        ui.showBookBtn.classList.add('hidden');
         ui.stickerFloat.classList.remove('show');
         setFeedback(ui.drawFeedback, '', true);
         renderDrawHeader();
       });
       ui.drawBox.addEventListener('click', openChest);
-      document.getElementById('showBookBtn').addEventListener('click', async () => {
-        await renderStickerGrid();
-        renderDrawHeader();
-        showPage('book');
+      ui.stickerGrid.addEventListener('click', async (event) => {
+        const stickerCell = event.target.closest('.sticker.clickable');
+        if (!stickerCell) return;
+        const id = stickerCell.dataset.stickerId;
+        if (!id) return;
+        await openFullscreenSticker(id, {
+          title: id,
+          sub: '선택한 스티커를 크게 보고 있어요',
+          primaryLabel: '닫기'
+        });
       });
+      ui.modalCloseBtn.addEventListener('click', closeFullscreenSticker);
       document.getElementById('backToDrawBtn').addEventListener('click', () => showPage('draw'));
       document.getElementById('backToResultBtn').addEventListener('click', () => showPage('result'));
 
