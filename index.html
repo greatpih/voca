@@ -5,104 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>시나모롤 스펠링 게임</title>
     <style>
-      :root {
-        --bg: #f5f7ff;
-        --card: #ffffff;
-        --primary: #f27fbb;
-        --primary-dark: #c84d8c;
-        --mint: #d9f4ff;
-        --text: #2d3250;
-      }
-      * { box-sizing: border-box; }
-      body { margin: 0; font-family: Arial, sans-serif; color: var(--text); background: var(--bg); }
-      .container { max-width: 880px; margin: 0 auto; padding: 16px; }
-      .header {
-        background: linear-gradient(90deg, #f8dff1, #dff2ff);
-        border-radius: 14px;
-        padding: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-      }
-      .header h1 { margin: 4px 0; font-size: 30px; }
-      .hero { width: 96px; height: 96px; border-radius: 12px; background: white; object-fit: contain; padding: 8px; }
-      .card { background: var(--card); border-radius: 14px; box-shadow: 0 6px 18px rgba(27,39,94,.08); padding: 16px; margin-top: 14px; }
-      .hidden { display: none; }
-      .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-      .chip { background: #eef2ff; border-radius: 999px; padding: 6px 12px; font-weight: 700; }
-      .hintLabel { color: #4d648f; font-size: 13px; letter-spacing: 1px; font-weight: 700; }
-      .hint { background: #eef8ff; border-radius: 12px; padding: 16px; margin: 8px 0 12px; font-size: 30px; font-weight: 800; text-align: center; }
-      .input { width: 100%; border: 2px solid #d8e1f4; border-radius: 12px; font-size: 26px; padding: 10px 12px; }
-      .btn {
-        width: 100%; border: none; border-radius: 12px; background: var(--primary); color: #fff;
-        font-size: 22px; font-weight: 700; padding: 12px; margin-top: 12px; cursor: pointer;
-      }
-      .btn:hover { background: var(--primary-dark); }
-      .btn.secondary { background: #b2c5ff; }
-      .feedback { min-height: 26px; margin-top: 8px; font-weight: 700; }
-      .ok { color: #148451; }
-      .bad { color: #bb2b44; }
+      :root { --bg:#f5f7ff; --card:#fff; --pink:#f27fbb; --pink-dark:#cb4f91; --text:#2d3250; }
+      *{box-sizing:border-box}
+      body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+      .container{max-width:900px;margin:0 auto;padding:16px}
+      .header{background:linear-gradient(90deg,#f8dff1,#dff2ff);border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+      .header h1{margin:4px 0;font-size:30px}
+      .hero{width:96px;height:96px;border-radius:12px;background:#fff;object-fit:contain;padding:8px}
+      .card{background:var(--card);border-radius:14px;box-shadow:0 6px 18px rgba(27,39,94,.08);padding:16px;margin-top:14px}
+      .hidden{display:none}
+      .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+      .chip{background:#eef2ff;border-radius:999px;padding:6px 12px;font-weight:700}
+      .hintLabel{font-size:13px;color:#4d648f;letter-spacing:1px;font-weight:700}
+      .hint{background:#eef8ff;border-radius:12px;padding:16px;margin:8px 0 12px;font-size:30px;font-weight:800;text-align:center}
+      .input{width:100%;border:2px solid #d8e1f4;border-radius:12px;font-size:26px;padding:10px 12px}
+      .btn{width:100%;border:none;border-radius:12px;background:var(--pink);color:#fff;font-size:21px;font-weight:700;padding:12px;margin-top:12px;cursor:pointer}
+      .btn:hover{background:var(--pink-dark)}
+      .btn.secondary{background:#b2c5ff}
+      .feedback{min-height:26px;margin-top:8px;font-weight:700}.ok{color:#148451}.bad{color:#bb2b44}
+      .resultScore{font-size:42px;font-weight:900;margin:8px 0}
+      .center{text-align:center}
 
-      .resultTitle { font-size: 28px; margin-top: 0; }
-      .resultScore { font-size: 42px; font-weight: 900; margin: 8px 0; }
-      .resultStars { font-size: 24px; font-weight: 700; margin: 6px 0; }
+      .userGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-      .drawGrid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; }
-      .drawBoxWrap { text-align: center; }
-      .drawBox {
-        width: 180px; height: 180px; margin: 8px auto; border-radius: 20px;
-        background: linear-gradient(180deg, #ffe9f6, #ffd0ea);
-        border: 3px solid #f3a7d2;
-        box-shadow: inset 0 2px 0 #fff, 0 8px 18px rgba(214,87,152,.25);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 72px; user-select: none; cursor: pointer;
-        transition: transform .25s ease;
+      .drawArea{text-align:center}
+      .chest{
+        width:290px;height:290px;margin:10px auto;border-radius:28px;
+        background:linear-gradient(180deg,#ffe9f6,#ffcce6);
+        border:5px solid #f3a7d2;box-shadow:inset 0 3px 0 #fff,0 12px 24px rgba(214,87,152,.28);
+        display:flex;align-items:center;justify-content:center;font-size:120px;cursor:pointer;user-select:none;
+        transition:transform .2s ease;
       }
-      .drawBox:hover { transform: translateY(-3px) scale(1.02); }
-      .drawBox.opening { animation: pop .6s ease; }
-      @keyframes pop {
-        0% { transform: scale(1); }
-        35% { transform: scale(1.12) rotate(-3deg); }
-        70% { transform: scale(.92) rotate(2deg); }
-        100% { transform: scale(1); }
-      }
-      .reveal {
-        margin-top: 10px;
-        min-height: 140px;
-        border-radius: 12px;
-        background: #f8fbff;
-        border: 1px solid #dce8ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px;
-      }
-      .reveal img { width: 100px; height: 100px; object-fit: contain; }
+      .chest:hover{transform:translateY(-3px) scale(1.02)}
+      .chest.opening{animation:openPop .7s ease}
+      @keyframes openPop{0%{transform:scale(1)}35%{transform:scale(1.16) rotate(-4deg)}70%{transform:scale(.9) rotate(3deg)}100%{transform:scale(1)}}
+      .bigReveal{margin-top:12px;min-height:250px;border:1px solid #dce8ff;border-radius:14px;background:#f8fbff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:12px}
+      .bigReveal img{width:190px;height:190px;object-fit:contain}
 
-      .stickers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-      .sticker {
-        border: 1px solid #dce6ff;
-        border-radius: 10px;
-        min-height: 112px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        background: #fafcff;
-        padding: 8px;
-      }
-      .sticker img { width: 72px; height: 72px; object-fit: contain; }
-      .lock { color: #9ca9c6; font-size: 28px; }
-      .small { font-size: 12px; color: #5f6f8f; }
-
-      @media (max-width: 760px) {
-        .hint { font-size: 24px; }
-        .drawGrid { grid-template-columns: 1fr; }
-      }
+      .stickers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+      .sticker{border:1px solid #dce6ff;border-radius:10px;min-height:112px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;background:#fafcff;padding:8px}
+      .sticker img{width:72px;height:72px;object-fit:contain}
+      .lock{color:#9ca9c6;font-size:28px}.small{font-size:12px;color:#5f6f8f}
+      @media (max-width:760px){.hint{font-size:24px}.userGrid{grid-template-columns:1fr}.chest{width:220px;height:220px;font-size:90px}}
     </style>
   </head>
   <body>
@@ -111,30 +55,38 @@
         <div>
           <div style="font-weight:700;color:#854a87;">CINNAMOROLL WORD GAME</div>
           <h1>시나모롤 스펠링 게임 ✨</h1>
-          <div>10문제 라운드 · 9개 이상 정답이면 별 2개!</div>
+          <div>10문제 라운드 · 9개 이상 정답이면 별 2개</div>
         </div>
         <img id="heroImage" class="hero" src="./public/stickers/sticker_01.png" alt="시나모롤" />
       </div>
 
-      <section id="quizPage" class="card">
+      <section id="userPage" class="card">
+        <h2 style="margin-top:0;">사용자 선택</h2>
+        <p>누가 플레이할지 선택해 주세요. 사용자별로 스티커/별이 따로 저장돼요.</p>
+        <div class="userGrid">
+          <button id="userKid" class="btn" type="button">아이 계정으로 시작</button>
+          <button id="userParent" class="btn secondary" type="button">테스트 계정으로 시작</button>
+        </div>
+      </section>
+
+      <section id="quizPage" class="card hidden">
         <div class="chips">
+          <span id="activeUser" class="chip">사용자: -</span>
           <span id="progress" class="chip">문제 1 / 10</span>
           <span id="roundCorrect" class="chip">맞은 개수 0</span>
         </div>
-
         <div class="hintLabel">ENGLISH MEANING</div>
         <div id="hint" class="hint"></div>
-
         <label for="answer" style="font-weight:700;">뜻을 보고 영어 스펠링을 입력하세요</label>
         <input id="answer" class="input" placeholder="여기에 입력" autocomplete="off" />
         <button id="checkBtn" type="button" class="btn">정답 확인</button>
         <div id="quizFeedback" class="feedback"></div>
       </section>
 
-      <section id="resultPage" class="card hidden">
-        <h2 class="resultTitle">라운드 완료 🎉</h2>
+      <section id="resultPage" class="card hidden center">
+        <h2 style="margin-top:0;">라운드 완료 🎉</h2>
         <div id="resultScore" class="resultScore">0 / 10</div>
-        <div id="resultStars" class="resultStars">획득 별: ⭐ 1</div>
+        <div id="resultStars" style="font-size:24px;font-weight:700;">획득 별: ⭐ 1</div>
         <button id="goDrawBtn" type="button" class="btn">뽑기 페이지로 이동</button>
         <button id="nextRoundBtn" type="button" class="btn secondary">다음 라운드 시작</button>
       </section>
@@ -144,22 +96,26 @@
           <span id="totalStars" class="chip">보유 별 ⭐ 0</span>
           <span id="collectionCount" class="chip">스티커 0 / 7</span>
         </div>
-
-        <div class="drawGrid">
-          <div class="drawBoxWrap">
-            <h3 style="margin:4px 0;">🎁 뽑기 상자</h3>
-            <div id="drawBox" class="drawBox" title="클릭해서 뽑기">📦</div>
-            <div style="font-size:13px;color:#5f6f8f;">상자를 눌러 열어보세요!</div>
-            <div id="drawFeedback" class="feedback"></div>
-            <div id="reveal" class="reveal"><div class="small">아직 뽑은 스티커가 없어요</div></div>
-            <button id="backToResultBtn" class="btn secondary" type="button">결과 페이지로 돌아가기</button>
-          </div>
-
-          <div>
-            <h3 style="margin:4px 0;">내 스티커북</h3>
-            <div id="stickerGrid" class="stickers"></div>
-          </div>
+        <div class="drawArea">
+          <h2 style="margin:4px 0;">🎁 보물상자 뽑기</h2>
+          <p>보물상자를 터치하면 크게 열리면서 스티커가 나와요!</p>
+          <div id="drawBox" class="chest" title="터치해서 열기">📦</div>
+          <div id="drawFeedback" class="feedback"></div>
+          <div id="reveal" class="bigReveal"><div class="small">아직 뽑은 스티커가 없어요</div></div>
+          <button id="showBookBtn" class="btn hidden" type="button">스티커북 확인하기</button>
+          <button id="backToResultBtn" class="btn secondary" type="button">결과 페이지로 돌아가기</button>
         </div>
+      </section>
+
+      <section id="bookPage" class="card hidden">
+        <div class="chips">
+          <span id="bookUser" class="chip">사용자: -</span>
+          <span id="bookStars" class="chip">보유 별 ⭐ 0</span>
+          <span id="bookCount" class="chip">스티커 0 / 7</span>
+        </div>
+        <h2 style="margin-top:0;">내 스티커북</h2>
+        <div id="stickerGrid" class="stickers"></div>
+        <button id="backToDrawBtn" class="btn secondary" type="button">뽑기 페이지로 돌아가기</button>
       </section>
     </div>
 
@@ -176,16 +132,18 @@
         { word: 'luminous', hint: 'giving off light; shining' },
         { word: 'speck', hint: 'a very small spot' }
       ];
-
       const stickerIds = [1,2,3,4,5,6,7].map((n) => `sticker_${String(n).padStart(2, '0')}`);
-      const extCandidates = ['png', 'jpg', 'jpeg', 'webp'];
+      const extCandidates = ['png','jpg','jpeg','webp'];
 
       const ui = {
         pages: {
+          user: document.getElementById('userPage'),
           quiz: document.getElementById('quizPage'),
           result: document.getElementById('resultPage'),
-          draw: document.getElementById('drawPage')
+          draw: document.getElementById('drawPage'),
+          book: document.getElementById('bookPage')
         },
+        activeUser: document.getElementById('activeUser'),
         progress: document.getElementById('progress'),
         roundCorrect: document.getElementById('roundCorrect'),
         hint: document.getElementById('hint'),
@@ -196,46 +154,49 @@
         totalStars: document.getElementById('totalStars'),
         collectionCount: document.getElementById('collectionCount'),
         drawFeedback: document.getElementById('drawFeedback'),
-        stickerGrid: document.getElementById('stickerGrid'),
-        drawBox: document.getElementById('drawBox'),
         reveal: document.getElementById('reveal'),
+        drawBox: document.getElementById('drawBox'),
+        showBookBtn: document.getElementById('showBookBtn'),
+        stickerGrid: document.getElementById('stickerGrid'),
+        bookUser: document.getElementById('bookUser'),
+        bookStars: document.getElementById('bookStars'),
+        bookCount: document.getElementById('bookCount'),
         heroImage: document.getElementById('heroImage')
       };
 
       const state = {
+        userId: null,
         roundIndex: 0,
         roundCorrect: 0,
         totalStars: 0,
         collected: []
       };
 
+      function storageKey() {
+        return `voca-kids-state-v3-${state.userId}`;
+      }
+
       function saveState() {
-        const payload = {
+        if (!state.userId) return;
+        localStorage.setItem(storageKey(), JSON.stringify({
           totalStars: state.totalStars,
           collected: state.collected
-        };
-        localStorage.setItem('voca-kids-state-v2', JSON.stringify(payload));
+        }));
       }
 
       function loadState() {
-        const raw = localStorage.getItem('voca-kids-state-v2');
+        if (!state.userId) return;
+        const raw = localStorage.getItem(storageKey());
+        state.totalStars = 0;
+        state.collected = [];
         if (!raw) return;
         try {
           const parsed = JSON.parse(raw);
           state.totalStars = parsed.totalStars || 0;
           state.collected = parsed.collected || [];
         } catch {
-          // ignore broken save
+          // ignore
         }
-      }
-
-      function normalize(value) {
-        return value.trim().toLowerCase().replace(/\s+/g, ' ');
-      }
-
-      function setFeedback(target, message, ok = true) {
-        target.textContent = message;
-        target.className = `feedback ${ok ? 'ok' : 'bad'}`;
       }
 
       function showPage(name) {
@@ -243,8 +204,18 @@
         ui.pages[name].classList.remove('hidden');
       }
 
+      function normalize(value) {
+        return value.trim().toLowerCase().replace(/\s+/g, ' ');
+      }
+
+      function setFeedback(target, msg, ok=true) {
+        target.textContent = msg;
+        target.className = `feedback ${ok ? 'ok' : 'bad'}`;
+      }
+
       function renderQuiz() {
         const q = words[state.roundIndex];
+        ui.activeUser.textContent = `사용자: ${state.userId === 'kid' ? '아이' : '테스트'}`;
         ui.progress.textContent = `문제 ${state.roundIndex + 1} / ${words.length}`;
         ui.roundCorrect.textContent = `맞은 개수 ${state.roundCorrect}`;
         ui.hint.textContent = q.hint;
@@ -252,7 +223,7 @@
         ui.answer.focus();
       }
 
-      function resetRound() {
+      function startRound() {
         state.roundIndex = 0;
         state.roundCorrect = 0;
         setFeedback(ui.quizFeedback, '', true);
@@ -261,13 +232,12 @@
       }
 
       function finishRound() {
-        const earnedStars = state.roundCorrect >= 9 ? 2 : 1;
-        state.totalStars += earnedStars;
+        const earned = state.roundCorrect >= 9 ? 2 : 1;
+        state.totalStars += earned;
         saveState();
 
         ui.resultScore.textContent = `${state.roundCorrect} / ${words.length}`;
-        ui.resultStars.textContent = `획득 별: ⭐ ${earnedStars}`;
-        setFeedback(ui.quizFeedback, '', true);
+        ui.resultStars.textContent = `획득 별: ⭐ ${earned}`;
         renderDrawHeader();
         showPage('result');
       }
@@ -275,14 +245,12 @@
       function submitAnswer() {
         const q = words[state.roundIndex];
         const user = normalize(ui.answer.value);
-        const answer = normalize(q.word);
-
         if (!user) {
           setFeedback(ui.quizFeedback, '먼저 단어를 입력해 주세요.', false);
           return;
         }
 
-        if (user === answer) {
+        if (user === normalize(q.word)) {
           state.roundCorrect += 1;
           setFeedback(ui.quizFeedback, '정답! 다음 문제로 이동해요 ✅', true);
         } else {
@@ -290,13 +258,11 @@
         }
 
         state.roundIndex += 1;
-
         if (state.roundIndex >= words.length) {
           setTimeout(finishRound, 450);
-          return;
+        } else {
+          setTimeout(renderQuiz, 350);
         }
-
-        setTimeout(renderQuiz, 350);
       }
 
       async function firstExistingImage(id) {
@@ -315,91 +281,97 @@
       function renderDrawHeader() {
         ui.totalStars.textContent = `보유 별 ⭐ ${state.totalStars}`;
         ui.collectionCount.textContent = `스티커 ${state.collected.length} / ${stickerIds.length}`;
+        ui.bookUser.textContent = `사용자: ${state.userId === 'kid' ? '아이' : '테스트'}`;
+        ui.bookStars.textContent = `보유 별 ⭐ ${state.totalStars}`;
+        ui.bookCount.textContent = `스티커 ${state.collected.length} / ${stickerIds.length}`;
       }
 
       async function renderStickerGrid() {
         ui.stickerGrid.innerHTML = '';
-
         for (const id of stickerIds) {
           const item = document.createElement('div');
           item.className = 'sticker';
-
           if (state.collected.includes(id)) {
             const path = await firstExistingImage(id);
-            if (path) {
-              item.innerHTML = `<img src="${path}" alt="${id}" /><div class="small">${id}</div>`;
-            } else {
-              item.innerHTML = `<div class="lock">🖼️</div><div class="small">${id} (파일 없음)</div>`;
-            }
+            item.innerHTML = path
+              ? `<img src="${path}" alt="${id}" /><div class="small">${id}</div>`
+              : `<div class="lock">🖼️</div><div class="small">${id} (파일 없음)</div>`;
           } else {
             item.innerHTML = `<div class="lock">🔒</div><div class="small">잠김</div>`;
           }
-
           ui.stickerGrid.appendChild(item);
         }
       }
 
-      async function revealSticker(id) {
+      async function revealBigSticker(id) {
         const path = await firstExistingImage(id);
-        if (path) {
-          ui.reveal.innerHTML = `<img src="${path}" alt="${id}" /><div><strong>${id}</strong> 획득!</div>`;
-        } else {
-          ui.reveal.innerHTML = `<div class="lock">🖼️</div><div><strong>${id}</strong> 획득! (이미지 파일 없음)</div>`;
-        }
+        ui.reveal.innerHTML = path
+          ? `<img src="${path}" alt="${id}" /><div style="font-size:22px;font-weight:800;">${id} 획득!</div>`
+          : `<div class="lock" style="font-size:72px;">🖼️</div><div style="font-size:22px;font-weight:800;">${id} 획득! (이미지 없음)</div>`;
       }
 
-      async function openDrawBox() {
+      async function openChest() {
         if (state.totalStars < 1) {
-          setFeedback(ui.drawFeedback, '별이 부족해요. 라운드를 완료해서 별을 모아주세요!', false);
+          setFeedback(ui.drawFeedback, '별이 부족해요. 라운드를 먼저 완료해 주세요!', false);
           return;
         }
-
         const remaining = stickerIds.filter((id) => !state.collected.includes(id));
         if (!remaining.length) {
           setFeedback(ui.drawFeedback, '모든 스티커를 이미 모았어요! 🎉', true);
+          ui.showBookBtn.classList.remove('hidden');
           return;
         }
 
-        setFeedback(ui.drawFeedback, '상자를 여는 중...', true);
+        setFeedback(ui.drawFeedback, '보물상자를 여는 중...', true);
         ui.drawBox.classList.add('opening');
-
-        await new Promise((resolve) => setTimeout(resolve, 650));
+        await new Promise((r) => setTimeout(r, 720));
 
         state.totalStars -= 1;
         const picked = remaining[Math.floor(Math.random() * remaining.length)];
         state.collected.push(picked);
         saveState();
 
-        await revealSticker(picked);
-        renderDrawHeader();
-        renderStickerGrid();
-        setFeedback(ui.drawFeedback, `${picked} 획득! 중복 없이 저장됐어요.`, true);
+        await revealBigSticker(picked);
         ui.drawBox.classList.remove('opening');
+        ui.showBookBtn.classList.remove('hidden');
+        setFeedback(ui.drawFeedback, `${picked} 획득! 이제 스티커북에서 확인해 보세요.`, true);
+        renderDrawHeader();
       }
 
-      async function setupHero() {
+      async function setHeroImage() {
         const path = await firstExistingImage('sticker_01');
         if (path) ui.heroImage.src = path;
       }
 
+      function chooseUser(userId) {
+        state.userId = userId;
+        loadState();
+        renderDrawHeader();
+        startRound();
+      }
+
+      document.getElementById('userKid').addEventListener('click', () => chooseUser('kid'));
+      document.getElementById('userParent').addEventListener('click', () => chooseUser('parent'));
       document.getElementById('checkBtn').addEventListener('click', submitAnswer);
-      ui.answer.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') submitAnswer();
-      });
+      ui.answer.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAnswer(); });
+      document.getElementById('nextRoundBtn').addEventListener('click', startRound);
       document.getElementById('goDrawBtn').addEventListener('click', () => {
         showPage('draw');
+        ui.showBookBtn.classList.add('hidden');
+        setFeedback(ui.drawFeedback, '', true);
         renderDrawHeader();
-        renderStickerGrid();
       });
-      document.getElementById('nextRoundBtn').addEventListener('click', resetRound);
+      ui.drawBox.addEventListener('click', openChest);
+      document.getElementById('showBookBtn').addEventListener('click', async () => {
+        await renderStickerGrid();
+        renderDrawHeader();
+        showPage('book');
+      });
+      document.getElementById('backToDrawBtn').addEventListener('click', () => showPage('draw'));
       document.getElementById('backToResultBtn').addEventListener('click', () => showPage('result'));
-      ui.drawBox.addEventListener('click', openDrawBox);
 
-      loadState();
-      setupHero();
-      renderDrawHeader();
-      renderStickerGrid();
-      resetRound();
+      setHeroImage();
+      showPage('user');
     </script>
   </body>
 </html>
