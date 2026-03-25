@@ -29,6 +29,37 @@
       .userGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
       .drawArea{text-align:center}
+      .chestStage{
+        position:relative;
+        width:320px;
+        margin:12px auto 8px;
+        padding:14px 12px 16px;
+        border-radius:24px;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(255,255,255,.35) 0 4px, transparent 5px),
+          radial-gradient(circle at 75% 30%, rgba(255,255,255,.28) 0 3px, transparent 4px),
+          radial-gradient(circle at 60% 80%, rgba(255,255,255,.25) 0 4px, transparent 5px),
+          linear-gradient(180deg, #8a2fff 0%, #5b16c9 45%, #3d0a97 100%);
+        border: 2px solid #9b64f4;
+        box-shadow: inset 0 0 25px rgba(255,255,255,.15), 0 10px 22px rgba(44,15,103,.35);
+      }
+      .stickerFloat{
+        position:absolute;
+        top:8px;
+        left:50%;
+        transform:translateX(-50%) translateY(0);
+        width:122px;height:122px;
+        border-radius:18px;
+        display:flex;align-items:center;justify-content:center;
+        background:linear-gradient(180deg,#ff86d1,#e04caf);
+        border:3px solid #ffccf0;
+        box-shadow:0 0 26px rgba(255,182,243,.9), 0 0 64px rgba(255,255,255,.45);
+        opacity:0;
+        transition:all .45s ease;
+        z-index:2;
+      }
+      .stickerFloat img{width:84px;height:84px;object-fit:contain}
+      .stickerFloat.show{opacity:1;transform:translateX(-50%) translateY(-8px) scale(1.04)}
       .chest{
         width:290px;height:290px;margin:10px auto;border-radius:28px;
         background:linear-gradient(180deg,#ffe9f6,#ffcce6);
@@ -38,15 +69,14 @@
       }
       .chest:hover{transform:translateY(-3px) scale(1.02)}
       .chest.opening{animation:openPop .7s ease}
+      .chest.burst{box-shadow:0 0 38px rgba(255,255,255,.95), 0 0 80px rgba(255,223,108,.8)}
       @keyframes openPop{0%{transform:scale(1)}35%{transform:scale(1.16) rotate(-4deg)}70%{transform:scale(.9) rotate(3deg)}100%{transform:scale(1)}}
-      .bigReveal{margin-top:12px;min-height:250px;border:1px solid #dce8ff;border-radius:14px;background:#f8fbff;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;padding:12px}
-      .bigReveal img{width:190px;height:190px;object-fit:contain}
 
       .stickers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
       .sticker{border:1px solid #dce6ff;border-radius:10px;min-height:112px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;background:#fafcff;padding:8px}
       .sticker img{width:72px;height:72px;object-fit:contain}
       .lock{color:#9ca9c6;font-size:28px}.small{font-size:12px;color:#5f6f8f}
-      @media (max-width:760px){.hint{font-size:24px}.userGrid{grid-template-columns:1fr}.chest{width:220px;height:220px;font-size:90px}}
+      @media (max-width:760px){.hint{font-size:24px}.userGrid{grid-template-columns:1fr}.chestStage{width:260px}.chest{width:220px;height:220px;font-size:90px}}
     </style>
   </head>
   <body>
@@ -99,9 +129,12 @@
         <div class="drawArea">
           <h2 style="margin:4px 0;">🎁 보물상자 뽑기</h2>
           <p>보물상자를 터치하면 크게 열리면서 스티커가 나와요!</p>
-          <div id="drawBox" class="chest" title="터치해서 열기">📦</div>
+          <div class="chestStage">
+            <div id="stickerFloat" class="stickerFloat"></div>
+            <div id="drawBox" class="chest" title="터치해서 열기">📦</div>
+          </div>
           <div id="drawFeedback" class="feedback"></div>
-          <div id="reveal" class="bigReveal"><div class="small">아직 뽑은 스티커가 없어요</div></div>
+          <div class="small">상자가 열리면 위에 스티커가 크게 나타나요</div>
           <button id="showBookBtn" class="btn hidden" type="button">스티커북 확인하기</button>
           <button id="backToResultBtn" class="btn secondary" type="button">결과 페이지로 돌아가기</button>
         </div>
@@ -154,7 +187,7 @@
         totalStars: document.getElementById('totalStars'),
         collectionCount: document.getElementById('collectionCount'),
         drawFeedback: document.getElementById('drawFeedback'),
-        reveal: document.getElementById('reveal'),
+        stickerFloat: document.getElementById('stickerFloat'),
         drawBox: document.getElementById('drawBox'),
         showBookBtn: document.getElementById('showBookBtn'),
         stickerGrid: document.getElementById('stickerGrid'),
@@ -305,9 +338,10 @@
 
       async function revealBigSticker(id) {
         const path = await firstExistingImage(id);
-        ui.reveal.innerHTML = path
-          ? `<img src="${path}" alt="${id}" /><div style="font-size:22px;font-weight:800;">${id} 획득!</div>`
-          : `<div class="lock" style="font-size:72px;">🖼️</div><div style="font-size:22px;font-weight:800;">${id} 획득! (이미지 없음)</div>`;
+        ui.stickerFloat.innerHTML = path
+          ? `<img src="${path}" alt="${id}" />`
+          : `<div class="lock" style="font-size:52px;">🖼️</div>`;
+        ui.stickerFloat.classList.add('show');
       }
 
       async function openChest() {
@@ -323,6 +357,7 @@
         }
 
         setFeedback(ui.drawFeedback, '보물상자를 여는 중...', true);
+        ui.stickerFloat.classList.remove('show');
         ui.drawBox.classList.add('opening');
         await new Promise((r) => setTimeout(r, 720));
 
@@ -333,6 +368,8 @@
 
         await revealBigSticker(picked);
         ui.drawBox.classList.remove('opening');
+        ui.drawBox.classList.add('burst');
+        setTimeout(() => ui.drawBox.classList.remove('burst'), 420);
         ui.showBookBtn.classList.remove('hidden');
         setFeedback(ui.drawFeedback, `${picked} 획득! 이제 스티커북에서 확인해 보세요.`, true);
         renderDrawHeader();
@@ -358,6 +395,7 @@
       document.getElementById('goDrawBtn').addEventListener('click', () => {
         showPage('draw');
         ui.showBookBtn.classList.add('hidden');
+        ui.stickerFloat.classList.remove('show');
         setFeedback(ui.drawFeedback, '', true);
         renderDrawHeader();
       });
