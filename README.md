@@ -134,5 +134,6 @@ cat | 고양이
 - 답하는 방법: 보기 고르기 / 직접 쓰기
 - 기록(별, 보석, 오늘 푼 문제 수)은 그 기기 브라우저에 저장돼요.
 
-## 효과음 다시 만들기 (개발용)
-효과음 15개는 `tools/gen_sfx.py`로 만들어 `tools/embed_sfx.py`로 `math.html` 안에 넣었습니다. 사용법은 `tools/gen_sfx.py` 맨 위 설명을 보세요.
+## 효과음·글꼴 다시 만들기 (개발용)
+- 효과음 15개는 `tools/gen_sfx.py`로 만들어 `tools/embed_sfx.py`로 `math.html` 안에 넣었습니다. 사용법은 `tools/gen_sfx.py` 맨 위 설명을 보세요.
+- 글씨체는 **카페24 써라운드**(카페24 무료 글꼴, npm `@noonnu/cafe24-ssurround`)입니다. 게임에 쓰인 글자만 골라 `tools/embed_font.py`로 `math.html` 안에 넣었기 때문에 인터넷 없이도 같은 글씨로 보입니다. 화면 문구를 새로 쓰면 이 스크립트를 다시 돌려 주세요.
