@@ -1,0 +1,42 @@
+/* A miniature bakery with the same soft materials as the pets. */
+:root{--ink:#51465f;--navy:#63527f;--navy-deep:#493d67;--sun:#f4c777;--sun-d:#c49a59;--green-d:#557e70;--table:#e8cbb3}
+.scene{background:var(--bakery-room-play) center/100% 100% no-repeat #e9ded0}
+.scene>.wall,.scene>.window,.scene>.curtain,.scene>.sill,.scene>.bunting,.scene>.table{display:none}
+.plate{background:var(--bakery-plate-mint) center/100% 100% no-repeat;border-radius:150px/120px;box-shadow:none;filter:drop-shadow(0 10px 7px #654d3c24)}
+.plate.R{background-image:var(--bakery-plate-lavender)}
+.plate:before,.plate:after{display:none}
+.plate.exchange-focus{background-color:transparent;box-shadow:0 0 0 6px #fff5bf,0 0 0 14px #fff1bf33;filter:drop-shadow(0 10px 10px #281c3f55)}
+.baked-cookie,.rod-body{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;-webkit-user-drag:none}
+.ck>.baked-cookie{filter:drop-shadow(0 2px 1px #6e4e2b30)}
+.item.glow>.baked-cookie{filter:drop-shadow(0 0 6px #fff5ad) drop-shadow(0 0 3px #e5b843)}
+.item.counted>.baked-cookie{filter:drop-shadow(0 0 5px #efc665)}
+.rod .band{position:absolute;inset:0;width:100%;height:100%;transform-origin:50% 51%;pointer-events:none}
+.rod .band img{width:100%;height:100%;display:block}
+.rod .band b{position:absolute;left:0;right:0;top:48%;text-align:center;font-family:Arial,sans-serif;font-size:11px;color:white;text-shadow:0 1px #60819c88;line-height:1;font-weight:700}
+.tfbg{background:linear-gradient(#f7efe2aa,#e6d6bdaa);box-shadow:inset 0 1px 2px #fff9,0 2px 3px #795b3d18;border:1px solid #c1ac922b;border-radius:14px}
+.tfbg i{background:radial-gradient(ellipse,#c8b39455,#f6e9d855);box-shadow:inset 0 1px 2px #886b4d1c}
+.topbar{background:linear-gradient(#786893,#61517b);box-shadow:0 3px 8px #46354f33}
+.pill{background:#4e426966}
+.ibtn{background:linear-gradient(#f8dfaa,#ecc98c);box-shadow:inset 0 2px 2px #fff9,0 3px 0 #bda071;color:#5d506e}
+.bub{background:radial-gradient(circle at 35% 25%,#fffdf9,#f0e9e0);box-shadow:inset 0 2px 5px #fff,0 7px 12px #694c4120}
+.bub.l{color:#b87858}.bub.r{color:#8871a8}.blabel{background:#8b7b9bde}
+.eq{background:linear-gradient(#719a8c,#5f877a);border-color:#c5a986;box-shadow:inset 0 2px 4px #456e6355,0 0 0 2px #a88d70,0 7px 12px #715c4929;color:#fffdf4}
+.dock{background:linear-gradient(#eee0db,#e2cac5);border-top-color:#f7eee8;box-shadow:inset 0 6px 12px #9b76671c}
+.ans,.key{background:linear-gradient(#a7ccba,#7fae97);box-shadow:inset 0 3px 4px #f6fff5aa,0 6px 0 #608a78,0 10px 12px #6a66521f;text-shadow:0 2px #53776344}
+.ans.wrong{background:#c6b9bd;box-shadow:0 6px 0 #a3969b}
+.key.ok,.nextbtn,.cbtn.alt{background:linear-gradient(#f8dfa4,#ebc582);box-shadow:inset 0 3px 4px #fff8,0 6px 0 #bd995f;color:#66543b}
+.key.del{background:linear-gradient(#edcccd,#d8adaf);box-shadow:inset 0 3px 4px #fff7,0 6px 0 #b58c91}
+.prompt{background:#fffaf2;box-shadow:0 5px 0 #c8aaa6,0 9px 14px #6d514718;color:#665472}
+.prompt .ic{background:#ab98bf}
+.cbtn.main{background:linear-gradient(#a7ccba,#7fae97);box-shadow:0 6px 0 #608a78}
+.explain-control{background:linear-gradient(#fffaf5,#e9e0ee);box-shadow:0 5px 0 #b4a0b6}
+.explain-control[aria-pressed=true]{background:#9682ad}
+.mapbg{background:var(--bakery-room-wide) center/cover no-repeat #e9dfcf}
+.mapbg:after{inset:0;background:linear-gradient(#fff9ec44,#fff6e655);opacity:1}
+#scrSplash>.sun,#scrSplash>.cloud,#scrSplash>.wave,#scrMap>.sun,#scrMap>.cloud,#scrMap>.wave,#scrMap>.mapdeco{display:none}
+.node .pad{background:radial-gradient(circle at 35% 25%,#e1dce9,#b7a8cb);box-shadow:inset 0 3px 3px #fff8,inset 0 -5px 5px #8e7da533,0 6px 0 #9b8ba9,0 12px 13px #63513f22}
+.node.done .pad{background:radial-gradient(circle at 35% 25%,#c3e0d2,#90bca8);box-shadow:inset 0 3px 3px #fff9,0 6px 0 #729b86,0 12px 13px #63513f22}
+.node.rec .pad{background:radial-gradient(circle at 35% 25%,#fae7b9,#e3ba75);box-shadow:inset 0 3px 3px #fff9,0 6px 0 #be985d,0 0 0 7px #fff9,0 12px 13px #63513f22}
+.node .nl{background:#fffaf3;color:#6a5878;box-shadow:0 3px 0 #b9a48a33}
+.clearbg{background:radial-gradient(circle at 25% 45%,#fbf2e8aa,transparent 40%),linear-gradient(150deg,#a9b7ce,#b9a6d3 60%,#dbc6dd)}
+.logo .c1{color:#f6d69c}.logo .c2{color:#d7b6d5}

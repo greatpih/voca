@@ -130,6 +130,7 @@ cat | 고양이
 
 ## 설정 (오른쪽 위 톱니바퀴)
 - 효과음 켜고 끄기
+- 효과음 크기: 작게 / 보통 / 크게
 - 한 번에 푸는 문제 수: 6 / 8 / 10
 - 답하는 방법: 보기 고르기 / 직접 쓰기
 - 기록(별, 보석, 오늘 푼 문제 수)은 그 기기 브라우저에 저장돼요.
@@ -141,17 +142,28 @@ cat | 고양이
 |---|---|
 | `tools/sfx/*.mp3` | 효과음 원본 15개 |
 | `tools/fonts/Cafe24Ssurround.woff` | 글꼴 원본 (카페24 써라운드) |
-| `tools/gen_sfx.py` | 효과음 새로 만들기 |
-| `tools/embed_sfx.py` | 효과음을 `math.html` 안에 넣기 |
+| `tools/audio/generate.mjs` | 부드러운 효과음 15개 합성 |
+| `tools/audio/embed.mjs` | 효과음과 음량 제어 코드를 `math.html`에 넣기 |
 | `tools/embed_font.py` | 쓰인 글자만 골라 글꼴을 `math.html` 안에 넣기 |
 
 ```bash
 pip install fonttools brotli          # 글꼴 도구에 필요
-python3 tools/embed_sfx.py tools/sfx math.html
-python3 tools/embed_font.py tools/fonts/Cafe24Ssurround.woff math.html
+node tools/audio/embed.mjs
+node tools/presentation/embed.mjs
 ```
-- 화면 문구를 새로 쓰면 `embed_font.py`를 다시 돌려야 새 글자도 같은 글씨로 보입니다.
-- 소리를 바꾸려면 `tools/sfx/`의 MP3를 바꾸거나 `tools/gen_sfx.py`로 다시 만든 뒤 `embed_sfx.py`를 돌리세요.
+- 현재는 `presentation/embed.mjs`가 전체 한글 글꼴을 넣으므로 새 문구도 표시됩니다.
+- 소리는 `node tools/audio/generate.mjs tools/sfx work/audio-build`로 만들고 `tools/audio/embed.mjs`로 반영합니다. FFmpeg가 필요합니다.
+- 이전 `gen_sfx.py`, `embed_sfx.py`, `embed_font.py`는 과거 버전의 보관용 도구입니다.
+
+## 쿠키·배경·효과음 통일
+
+쿠키 5종과 10개 탑, 도자기 접시, 밝은 원목 주방을 캐릭터와 같은 블렌더 조명으로
+만들었습니다. 이미지 12개는 모두 HTML에 포함됩니다. 파란 띠는 별도 그림이라
+받아내림에서 풀리는 움직임이 유지됩니다. 생성 방법은 [`tools/art/README.md`](tools/art/README.md)에 있습니다.
+
+효과음은 짧은 나무 타격음과 부드러운 말렛 음으로 바꾸었습니다. 소리 겹침 제한,
+피치 제한, 음량 3단계와 노드 해제를 적용했습니다. 자세한 내용은
+[`tools/audio/README.md`](tools/audio/README.md)에 있습니다.
 
 ## 2.5D 강아지 토리
 

@@ -1,4 +1,4 @@
-"""토리의 쿠키 셈놀이 효과음 만들기.
+"""이전 GM 효과음 보관용. 현재 생성기는 tools/audio/generate.mjs 입니다.
 
 GM 사운드폰트(pretty_midi 패키지에 들어 있는 TimGM6mb.sf2)로 악기 소리를 내고,
 나머지(뽁, 쉭, 와삭 등)는 numpy로 직접 합성해 MP3로 저장한다.
