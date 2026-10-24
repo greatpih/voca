@@ -4,9 +4,9 @@
 글자를 새로 쓰면(문구 추가 등) 이 스크립트를 다시 돌려야 그 글자도 들어간다.
 
   pip install fonttools brotli
-  python3 tools/embed_font.py <글꼴 파일(woff/ttf)> math.html
+  python3 tools/embed_font.py tools/fonts/Cafe24Ssurround.woff math.html
 
-기본 글꼴: 카페24 써라운드 (npm @noonnu/cafe24-ssurround, 카페24 무료 글꼴)
+원본 글꼴: tools/fonts/Cafe24Ssurround.woff (카페24 써라운드, tools/fonts/README.md 참고)
 """
 import base64, io, re, string, sys
 from fontTools import subset
@@ -20,7 +20,7 @@ plain = re.sub(r'data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+', '', text)
 chars = set(plain) | set(string.printable) | set('×−▶…·')
 chars = {c for c in chars if c.isprintable() and c not in '\t\n\r'}
 
-font = TTFont(font_path)
+font = TTFont(font_path, recalcTimestamp=False)  # 다시 돌려도 같은 결과가 나오게
 # 글꼴에 자리만 있고 모양이 빈 글자(▶ × → 등)는 빼서 기기 기본 글꼴로 그리게 한다
 cmap, glyphs = font.getBestCmap(), font.getGlyphSet()
 def has_outline(c):

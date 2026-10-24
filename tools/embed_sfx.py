@@ -1,6 +1,6 @@
 """tools/sfx/*.mp3 를 base64로 바꿔 math.html 의 SFX-BEGIN/SFX-END 사이에 넣는다.
 
-사용법: python3 tools/embed_sfx.py <mp3 폴더> math.html
+사용법: python3 tools/embed_sfx.py tools/sfx math.html
 """
 import base64, json, os, re, sys
 

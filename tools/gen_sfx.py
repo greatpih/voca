@@ -4,8 +4,10 @@ GM 사운드폰트(pretty_midi 패키지에 들어 있는 TimGM6mb.sf2)로 악�
 나머지(뽁, 쉭, 와삭 등)는 numpy로 직접 합성해 MP3로 저장한다.
 
   pip install numpy scipy pretty_midi tinysoundfont   # ffmpeg 필요
-  python3 tools/gen_sfx.py <출력 폴더> <TimGM6mb.sf2 경로>
-  python3 tools/embed_sfx.py <출력 폴더> math.html
+  python3 tools/gen_sfx.py tools/sfx <TimGM6mb.sf2 경로>
+  python3 tools/embed_sfx.py tools/sfx math.html
+
+만들어 둔 소리는 tools/sfx/*.mp3 에 있으니, 소리를 바꿀 때만 다시 만들면 된다.
 """
 import sys, numpy as np, tinysoundfont, subprocess, os
 from scipy.signal import butter, lfilter, fftconvolve

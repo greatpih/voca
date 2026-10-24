@@ -135,5 +135,20 @@ cat | 고양이
 - 기록(별, 보석, 오늘 푼 문제 수)은 그 기기 브라우저에 저장돼요.
 
 ## 효과음·글꼴 다시 만들기 (개발용)
-- 효과음 15개는 `tools/gen_sfx.py`로 만들어 `tools/embed_sfx.py`로 `math.html` 안에 넣었습니다. 사용법은 `tools/gen_sfx.py` 맨 위 설명을 보세요.
-- 글씨체는 **카페24 써라운드**(카페24 무료 글꼴, npm `@noonnu/cafe24-ssurround`)입니다. 게임에 쓰인 글자만 골라 `tools/embed_font.py`로 `math.html` 안에 넣었기 때문에 인터넷 없이도 같은 글씨로 보입니다. 화면 문구를 새로 쓰면 이 스크립트를 다시 돌려 주세요.
+원본 파일은 `tools/` 폴더에 있습니다.
+
+| 파일 | 내용 |
+|---|---|
+| `tools/sfx/*.mp3` | 효과음 원본 15개 |
+| `tools/fonts/Cafe24Ssurround.woff` | 글꼴 원본 (카페24 써라운드) |
+| `tools/gen_sfx.py` | 효과음 새로 만들기 |
+| `tools/embed_sfx.py` | 효과음을 `math.html` 안에 넣기 |
+| `tools/embed_font.py` | 쓰인 글자만 골라 글꼴을 `math.html` 안에 넣기 |
+
+```bash
+pip install fonttools brotli          # 글꼴 도구에 필요
+python3 tools/embed_sfx.py tools/sfx math.html
+python3 tools/embed_font.py tools/fonts/Cafe24Ssurround.woff math.html
+```
+- 화면 문구를 새로 쓰면 `embed_font.py`를 다시 돌려야 새 글자도 같은 글씨로 보입니다.
+- 소리를 바꾸려면 `tools/sfx/`의 MP3를 바꾸거나 `tools/gen_sfx.py`로 다시 만든 뒤 `embed_sfx.py`를 돌리세요.
