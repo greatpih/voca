@@ -152,3 +152,13 @@ python3 tools/embed_font.py tools/fonts/Cafe24Ssurround.woff math.html
 ```
 - 화면 문구를 새로 쓰면 `embed_font.py`를 다시 돌려야 새 글자도 같은 글씨로 보입니다.
 - 소리를 바꾸려면 `tools/sfx/`의 MP3를 바꾸거나 `tools/gen_sfx.py`로 다시 만든 뒤 `embed_sfx.py`를 돌리세요.
+
+## 2.5D 강아지 토리
+
+토리는 블렌더로 만든 크림색 강아지로 바뀌었습니다. 시작 화면, 학습 지도,
+문제 화면과 완료 화면에서 같은 캐릭터를 사용하며, 쿠키를 바라보기,
+받아올림·받아내림의 놀람, 정답의 웃음과 점프, 오답 반응이 연결되어 있습니다.
+캐릭터와 책상 위 앞발 이미지도 `math.html`에 포함되어 오프라인으로 실행됩니다.
+
+블렌더 원본, 재생 코드, 이미지 원본과 재생성 방법은
+[`tools/puppy/README.md`](tools/puppy/README.md)에 있습니다.
