@@ -1,0 +1,25 @@
+Motion revision, 2026-10-24
+
+Reference: user-supplied video_2026-10-23_23-37-40.mp4.
+Reviewed existing contact sheets and newly extracted 8 fps frames from 00:58–01:00
+and 02:09–02:11. The original videos are not copied into the repository.
+
+Observed: in the cookie scene, the red character changes its mouth expression
+while the purple character changes to closed eyes and an eating expression as
+counts appear. They do not show the same expression throughout this sequence.
+During the clear transition, the revealed red character changes arm positions.
+These observations are based on sampled frames, not motion capture or a claim
+of exact reconstruction of the original app's animation curves.
+
+Adaptation: preserve the approved 2.5D puppy and cat designs. Give Tori an eager
+anticipation/leap/landing and lagging ear/wag motion. Give Bora a one-paw wave,
+slow blink, ear flick, curved-tail sway and paw-to-cheek gesture. Keep arithmetic
+and cookie mechanics intact. Use asymmetric timing and calm holds between
+responses. Reaction clips return to rest; shared game mood timers no longer
+cut off a landing or make both pets repeat an identical jump indefinitely.
+
+Validation: render contact sheets; app splash/play/clear screens; eating, wrong
+answer and correct answer reactions; one full six-question mixed round; no
+browser warnings/errors. Playback unit checks cover independent idle offsets,
+staggered reaction, complete landing, one-shot stop, background pause and reduced
+motion. Physical tablet performance has not been measured.

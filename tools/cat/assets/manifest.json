@@ -1,43 +1,64 @@
 {
-  "cell": 320,
+  "cell": 256,
   "columns": 8,
-  "fps": 15,
+  "fps": 24,
+  "version": 2,
   "clips": {
     "normal": {
       "start": 0,
-      "count": 24
+      "count": 96,
+      "loop": true,
+      "poster": 0
+    },
+    "curious": {
+      "start": 96,
+      "count": 54,
+      "loop": false,
+      "poster": 21
     },
     "happy": {
-      "start": 24,
-      "count": 20
+      "start": 150,
+      "count": 48,
+      "loop": false,
+      "poster": 18
     },
     "sad": {
-      "start": 44,
-      "count": 16
+      "start": 198,
+      "count": 36,
+      "loop": false,
+      "poster": 14
     },
     "wow": {
-      "start": 60,
-      "count": 12
+      "start": 234,
+      "count": 30,
+      "loop": false,
+      "poster": 11
     },
     "lookLeft": {
-      "start": 72,
-      "count": 12
+      "start": 264,
+      "count": 24,
+      "loop": false,
+      "poster": 9
     },
     "lookRight": {
-      "start": 84,
-      "count": 12
+      "start": 288,
+      "count": 24,
+      "loop": false,
+      "poster": 9
     },
     "eat": {
-      "start": 96,
-      "count": 16
+      "start": 312,
+      "count": 42,
+      "loop": false,
+      "poster": 16
     }
   },
   "crop": [
-    44,
-    18,
-    232,
-    218
+    35,
+    14,
+    186,
+    175
   ],
-  "frames": 112,
-  "rows": 14
+  "frames": 354,
+  "rows": 45
 }

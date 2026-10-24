@@ -3,7 +3,7 @@
 blender -b --python tools/puppy/render.py -- --output-dir /absolute/build/path
 The model and lighting are kept in source.blend; no external textures are needed.
 """
-import bpy, math, json, sys, argparse, os, datetime, ctypes
+import bpy, math, json, sys, argparse, os, datetime, ctypes, importlib.util
 from pathlib import Path
 from mathutils import Vector
 
@@ -12,6 +12,8 @@ args.add_argument('--source');args.add_argument('--character',choices=['puppy','
 opt=args.parse_args(sys.argv[sys.argv.index('--')+1:])
 OUT=Path(opt.output_dir).resolve();OUT.mkdir(parents=True,exist_ok=True)
 HERE=Path(__file__).resolve().parent
+sys.dont_write_bytecode=True
+spec=importlib.util.spec_from_file_location('pet_motion',HERE/'motion.py');motion=importlib.util.module_from_spec(spec);spec.loader.exec_module(motion)
 record={'pid':os.getpid(),'executable':bpy.app.binary_path,'workingDirectory':str(Path.cwd()),'purpose':'Render transparent '+opt.character+' animation assets','keepRunning':False}
 if os.name=='nt':
     class FT(ctypes.Structure):_fields_=[('lo',ctypes.c_uint32),('hi',ctypes.c_uint32)]
@@ -28,7 +30,7 @@ for o in bpy.data.objects:
     o.animation_data_clear()
     if o not in parts and o.type not in ('LIGHT','CAMERA'):o.hide_render=True
 poses={o.name:(o.location.copy(),o.rotation_euler.copy(),o.scale.copy()) for o in parts}
-scene.render.film_transparent=True;scene.render.resolution_x=320;scene.render.resolution_y=320;scene.render.resolution_percentage=100
+scene.render.film_transparent=True;scene.render.resolution_x=256;scene.render.resolution_y=256;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.cycles.samples=24
 scene.camera.data.ortho_scale=4.3
 scene.camera.location=(2.1,-10,4.0)
@@ -64,70 +66,29 @@ arms=[bpy.data.objects['Front paw pivot '+str(s)] for s in (-1,1)]
 normal_mouth=[o for o in parts if o.name.startswith('Smile ') or o.name=='Philtrum']
 brows=[o for o in parts if o.name.startswith('Eyebrow ')]
 
-clips=[('normal',24),('happy',20),('sad',16),('wow',12),('lookLeft',12),('lookRight',12)]
-if opt.character=='cat':clips.append(('eat',16))
-manifest={'cell':320,'columns':8,'fps':15,'clips':{},'crop':[44,18,232,218]}
+cat=opt.character=='cat'
+clips=motion.clips(cat)
+manifest={'cell':256,'columns':8,'fps':motion.FPS,'version':2,'clips':{},'crop':[35,14,186,175]}
+tail=bpy.data.objects['Tail / wag']
+ctx=dict(root=root,head=head,tail=tail,eyes=eyes,ears=ears,arms=arms,normal_mouth=normal_mouth,brows=brows,closed=closed,mouth=mouth,tongue=tongue,frown=frown,objects=bpy.data.objects)
+if cat:
+    ctx['tail_splines']=[]
+    for child in tail.children:
+        if child.type=='CURVE':
+            for spline in child.data.splines:
+                ctx['tail_splines'].append((spline,[p.co.copy() for p in spline.bezier_points]))
+        elif 'tip' in child.name.lower():ctx['tail_tip']=child
 (OUT/'frames').mkdir(exist_ok=True)
 frame=0
 for mood,count in clips:
-    manifest['clips'][mood]={'start':frame,'count':count}
+    manifest['clips'][mood]={'start':frame,'count':count,'loop':mood=='normal','poster':0 if mood=='normal' else round(count*.38)}
     for i in range(count):
-        u=i/max(1,count-1);wave=math.sin(u*math.tau)
+        u=i/count if mood=='normal' else i/(count-1)
         for o in parts:
             p=poses[o.name];o.location=p[0];o.rotation_euler=p[1];o.scale=p[2];o.hide_render=False
         for o in extra:o.hide_render=True
-        root.scale.z=1+.006*wave
-        bpy.data.objects['Tail / wag'].rotation_euler.y=.15*math.sin(u*math.tau*2)
-        bpy.data.objects['Tail / wag'].rotation_euler.z=.23*math.sin(u*math.tau*2)
-        for j,e in enumerate(ears):e.rotation_euler.y=(-1 if j else 1)*.025*wave
-        if mood=='normal':
-            head.rotation_euler.y=.025*wave
-            blink=max(.07,1-abs(i-14)*.93) if abs(i-14)<2 else 0
-            if 13<=i<=15:
-                for e in eyes:e.scale.z=.08 if i==14 else .55
-        elif mood=='happy':
-            for e in eyes:
-                for child in e.children:child.hide_render=True
-            for o in normal_mouth:o.hide_render=True
-            for o in closed+[mouth,tongue]:o.hide_render=False
-            jump=math.sin(math.pi*max(0,min(1,(u-.15)/.62))) if .15<u<.77 else 0
-            root.location.z=.29*jump
-            head.rotation_euler.y=-.055*wave
-            for j,a in enumerate(arms):a.rotation_euler.y=(1 if j==0 else -1)*(.15+.50*jump)
-            for j,e in enumerate(ears):e.rotation_euler.y=(1 if j==0 else -1)*(.12*jump+.06*wave)
-            if .02<u<.15:root.scale=(1.035,1.035,.96)
-            if .77<u<.90:root.scale=(1.04,1.04,.95)
-        elif mood=='sad':
-            for o in normal_mouth:o.hide_render=True
-            frown.hide_render=False
-            head.rotation_euler.z=.075*math.sin(u*math.tau*2)*math.sin(u*math.pi)
-            head.rotation_euler.x=.035
-            for j,b in enumerate(brows):b.rotation_euler.y=(1 if j else -1)*.20
-            for e in eyes:e.scale.z=.84
-        elif mood=='wow':
-            for o in normal_mouth:o.hide_render=True
-            mouth.hide_render=False;mouth.scale=(.072,.035,.10)
-            for e in eyes:e.scale=(1.12,1,1.12)
-            head.rotation_euler.x=-.035
-            for b in brows:b.location.z=.055
-        elif mood=='eat':
-            for e in eyes:
-                for child in e.children:child.hide_render=True
-            for o in normal_mouth:o.hide_render=True
-            for o in closed+[mouth,tongue]:o.hide_render=False
-            chew=.5+.5*math.cos(u*math.tau*3)
-            head.rotation_euler.x=.025*math.sin(u*math.tau*3)
-            mouth.scale=(.09+.015*chew,.035,.035+.045*chew)
-            tongue.scale.z=.015+.018*chew
-            for name in ['Cheek volume L','Cheek volume R']:
-                bpy.data.objects[name].scale.x=poses[name][2].x*(1+.035*chew)
-        else:
-            direction=-1 if mood=='lookLeft' else 1
-            head.rotation_euler.z=direction*.16
-            head.rotation_euler.x=.07
-            head.rotation_euler.y=direction*.025*wave
-        if mood not in ('wow','eat'):mouth.scale=(.125,.035,.105)
-        if mood!='eat':tongue.scale.z=.035
+        mouth.scale=(.125,.035,.105);tongue.scale=(.073,.015,.035)
+        motion.pose(cat,mood,u,ctx)
         scene.render.filepath=str(OUT/'frames'/f'{opt.character}-{frame:03d}.png');bpy.ops.render.render(write_still=True)
         frame+=1
 
