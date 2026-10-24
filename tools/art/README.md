@@ -4,6 +4,11 @@
 쿠키 10개 탑 2종, 분리되는 파란 띠, 민트·라벤더 도자기 접시, 배경 2종을 렌더링합니다.
 강아지·고양이 애니메이션은 기존 원본을 그대로 사용합니다.
 
+재질 색을 선명하게 보이도록 황금빛 쿠키, 진한 토핑, 민트·라벤더 접시와
+하늘색 창문을 사용합니다. 넓은 조명은 유지하고 환경광을 0.35로 낮추며,
+AgX Medium High Contrast와 노출 -0.15로 부드러운 명암 안에서 색을 살립니다.
+시작·지도 배경의 흰색 덮개도 낮춰 렌더링한 색이 충분히 보이게 합니다.
+
 ```powershell
 blender --background --python tools/art/render_assets.py -- --output-dir work/bakery-render
 node tools/art/package.mjs work/bakery-render

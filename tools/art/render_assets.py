@@ -13,6 +13,11 @@ record['startTime']=(datetime.datetime(1601,1,1,tzinfo=datetime.timezone.utc)+da
 (OUT/'render-process.json').write_text(json.dumps(record,indent=2))
 bpy.ops.wm.open_mainfile(filepath=str(HERE.parent/'puppy/source.blend'))
 scene=bpy.context.scene;scene.frame_set(1)
+# Keep broad, soft lights, but recover material colour and contact depth.
+scene.view_settings.view_transform='AgX'
+scene.view_settings.look='AgX - Medium High Contrast'
+scene.view_settings.exposure=-.15
+scene.world.node_tree.nodes['Background'].inputs[1].default_value=.35
 for o in list(bpy.data.objects):
     o.animation_data_clear()
     if o.type not in ('LIGHT','CAMERA'):bpy.data.objects.remove(o,do_unlink=True)
@@ -27,10 +32,10 @@ except Exception:pass
 cam=scene.camera;lights=[(o,o.location.copy(),o.data.energy,o.data.size) for o in bpy.data.objects if o.type=='LIGHT'];made=[]
 def mat(name,color,rough=.62):
     m=bpy.data.materials.new(name);m.use_nodes=True;m.diffuse_color=(*color,1);bs=m.node_tree.nodes['Principled BSDF'];bs.inputs['Base Color'].default_value=(*color,1);bs.inputs['Roughness'].default_value=rough;return m
-ivory=mat('Glazed oat ceramic',(.91,.86,.74),.32);mint=mat('Pistachio glaze',(.53,.74,.65),.35);lavender=mat('Lavender glaze',(.66,.57,.79),.35)
-dough=mat('Golden shortbread',(.66,.35,.115),.8);edge=mat('Baked biscuit edge',(.43,.19,.055),.85);chocolate=mat('Dark chocolate',(.095,.038,.022),.5)
-cream=mat('Cream icing',(.96,.84,.62),.5);jam=mat('Strawberry preserve',(.60,.08,.13),.3);rose=mat('Rose icing',(.80,.34,.44),.6)
-wood=mat('Pale maple',(.69,.49,.31),.72);plaster=mat('Warm vanilla wall',(.84,.78,.67),.95);sky=mat('Window sky',(.45,.72,.78),.9);leaf=mat('Sage plant',(.25,.49,.34),.7)
+ivory=mat('Glazed oat ceramic',(.94,.86,.68),.32);mint=mat('Pistachio glaze',(.23,.65,.44),.35);lavender=mat('Lavender glaze',(.48,.29,.73),.35)
+dough=mat('Golden shortbread',(.72,.29,.055),.8);edge=mat('Baked biscuit edge',(.32,.095,.018),.85);chocolate=mat('Dark chocolate',(.065,.018,.009),.5)
+cream=mat('Cream icing',(.98,.86,.57),.5);jam=mat('Strawberry preserve',(.72,.025,.065),.3);rose=mat('Rose icing',(.86,.14,.27),.6)
+wood=mat('Honey maple',(.76,.44,.19),.72);plaster=mat('Warm vanilla wall',(.89,.77,.53),.95);sky=mat('Window sky',(.16,.61,.81),.9);leaf=mat('Fresh sage plant',(.12,.42,.18),.7)
 def reg(o,name,ma):
     o.name=name;o.data.materials.append(ma);made.append(o)
     if hasattr(o.data,'polygons'):

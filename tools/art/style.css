@@ -32,7 +32,7 @@
 .explain-control{background:linear-gradient(#fffaf5,#e9e0ee);box-shadow:0 5px 0 #b4a0b6}
 .explain-control[aria-pressed=true]{background:#9682ad}
 .mapbg{background:var(--bakery-room-wide) center/cover no-repeat #e9dfcf}
-.mapbg:after{inset:0;background:linear-gradient(#fff9ec44,#fff6e655);opacity:1}
+.mapbg:after{inset:0;background:linear-gradient(#fff9ec0a,#fff6e612);opacity:1}
 #scrSplash>.sun,#scrSplash>.cloud,#scrSplash>.wave,#scrMap>.sun,#scrMap>.cloud,#scrMap>.wave,#scrMap>.mapdeco{display:none}
 .node .pad{background:radial-gradient(circle at 35% 25%,#e1dce9,#b7a8cb);box-shadow:inset 0 3px 3px #fff8,inset 0 -5px 5px #8e7da533,0 6px 0 #9b8ba9,0 12px 13px #63513f22}
 .node.done .pad{background:radial-gradient(circle at 35% 25%,#c3e0d2,#90bca8);box-shadow:inset 0 3px 3px #fff9,0 6px 0 #729b86,0 12px 13px #63513f22}
