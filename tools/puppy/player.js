@@ -1,27 +1,36 @@
-/* One shared decoded atlas; only visible characters are drawn, at 15 fps. */
+/* One decoded atlas per character; one loop draws only visible characters. */
 window.Puppy25 = (() => {
   'use strict';
-  const assets = PUPPY_ASSETS;
-  const meta = assets.manifest;
-  const atlas = new Image();
+  const models = {
+    tori: {assets: PUPPY_ASSETS, label: '강아지 토리'},
+    bora: {assets: CAT_ASSETS, label: '고양이 보라'}
+  };
+  for (const model of Object.values(models)) {
+    model.meta = model.assets.manifest;
+    model.atlas = new Image();
+    model.ready = false;
+  }
   const instances = new Map();
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let ready = false, raf = 0, lastTick = 0;
+  let raf = 0, lastTick = 0;
 
-  function markup() {
-    return `<span class="chr puppy25" data-mood="normal" role="img" aria-label="강아지 토리"><img class="puppy-poster" src="${assets.poster}" alt="" draggable="false"><canvas width="320" height="320" aria-hidden="true"></canvas></span>`;
+  function markup(kind = 'tori') {
+    const {assets, label} = models[kind];
+    return `<span class="chr puppy25" data-character="${kind}" data-mood="normal" role="img" aria-label="${label}"><img class="puppy-poster" src="${assets.poster}" alt="" draggable="false"><canvas width="320" height="320" aria-hidden="true"></canvas></span>`;
   }
-  function paws() {
+  function paws(kind = 'tori') {
+    const {assets} = models[kind];
     return `<span class="puppy-paws" aria-hidden="true"><img class="p p1" src="${assets.paw}" alt="" draggable="false"><img class="p p2" src="${assets.paw}" alt="" draggable="false"></span>`;
   }
   function attach() {
     document.querySelectorAll('.puppy25').forEach(el => {
       if (instances.has(el)) return;
       const canvas = el.querySelector('canvas');
-      const bust = !!el.closest('#chTori');
+      const bust = !!el.closest('#chTori, #chBora');
+      const model = models[el.dataset.character || 'tori'];
       canvas.height = bust ? 306 : 320;
       el.classList.toggle('puppy-bust', bust);
-      instances.set(el, {el, canvas, ctx: canvas.getContext('2d'), bust, clip: '', started: 0, frame: -1, visible: false, hop: ''});
+      instances.set(el, {el, model, canvas, ctx: canvas.getContext('2d'), bust, clip: '', started: 0, frame: -1, visible: false, hop: ''});
     });
     for (const [el] of instances) if (!el.isConnected) instances.delete(el);
     wake();
@@ -30,14 +39,16 @@ window.Puppy25 = (() => {
     const screen = el.closest('.screen');
     return el.isConnected && (!screen || screen.classList.contains('on'));
   }
-  function requestedClip(el) {
+  function requestedClip(el, meta) {
     const mood = el.dataset.mood;
-    if (mood === 'happy' || mood === 'eat') return 'happy';
+    if (mood === 'eat') return meta.clips.eat ? 'eat' : 'happy';
+    if (mood === 'happy') return 'happy';
     if (mood === 'sad' || mood === 'wow') return mood;
     return el.dataset.look === 'left' ? 'lookLeft' : el.dataset.look === 'right' ? 'lookRight' : 'normal';
   }
   function draw(state, now) {
-    let clip = requestedClip(state.el);
+    const {meta, atlas} = state.model;
+    let clip = requestedClip(state.el, meta);
     if (clip === 'normal' && state.clip === 'happy' && !reduceMotion.matches) {
       const duration = meta.clips.happy.count / meta.fps * 1000;
       // A short cookie response must land before returning to idle.
@@ -68,11 +79,11 @@ window.Puppy25 = (() => {
   }
   function tick(now) {
     raf = 0;
-    if (document.hidden || !ready) return;
+    if (document.hidden) return;
     let active = false;
-    const due = now - lastTick >= 1000 / meta.fps - 2;
+    const due = now - lastTick >= 1000 / 15 - 2;
     for (const state of instances.values()) {
-      if (isVisible(state.el)) {
+      if (state.model.ready && isVisible(state.el)) {
         active = true;
         if (due) draw(state, now);
       } else state.visible = false;
@@ -81,7 +92,7 @@ window.Puppy25 = (() => {
     if (active && !reduceMotion.matches) raf = requestAnimationFrame(tick);
   }
   function wake() {
-    if (ready && !document.hidden && !raf) {
+    if (Object.values(models).some(m => m.ready) && !document.hidden && !raf) {
       lastTick = 0;
       raf = requestAnimationFrame(tick);
     }
@@ -95,9 +106,11 @@ window.Puppy25 = (() => {
     if (el) el.dataset.look = side || '';
     wake();
   }
-  atlas.onload = () => { ready = true; attach(); };
-  atlas.onerror = () => { console.warn('Puppy animation unavailable; static preview retained.'); };
-  atlas.src = assets.atlas;
+  for (const model of Object.values(models)) {
+    model.atlas.onload = () => { model.ready = true; attach(); };
+    model.atlas.onerror = () => { console.warn(`${model.label}: animation unavailable; static preview retained.`); };
+    model.atlas.src = model.assets.atlas;
+  }
   new MutationObserver(records => {
     if (records.some(r => r.type === 'childList')) attach();
     else wake();

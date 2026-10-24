@@ -10,7 +10,13 @@ const assets = {
   atlas: data('puppy-atlas.webp'), poster: data('puppy-poster.webp'), paw: data('puppy-paw.webp')
 };
 const player = fs.readFileSync(path.join(dir, 'player.js'), 'utf8');
-const block = `<!-- PUPPY-ASSETS-BEGIN -->\n<script>\nconst PUPPY_ASSETS = ${JSON.stringify(assets)};\n${player}\n</script>\n<!-- PUPPY-ASSETS-END -->`;
+const catDir = path.resolve(dir, '../cat/assets');
+const catData = name => `data:image/webp;base64,${fs.readFileSync(path.join(catDir, name)).toString('base64')}`;
+const catAssets = {
+  manifest: JSON.parse(fs.readFileSync(path.join(catDir, 'manifest.json'), 'utf8')),
+  atlas: catData('cat-atlas.webp'), poster: catData('cat-poster.webp'), paw: catData('cat-paw.webp')
+};
+const block = `<!-- PUPPY-ASSETS-BEGIN -->\n<script>\nconst PUPPY_ASSETS = ${JSON.stringify(assets)};\nconst CAT_ASSETS = ${JSON.stringify(catAssets)};\n${player}\n</script>\n<!-- PUPPY-ASSETS-END -->`;
 let html = fs.readFileSync(target, 'utf8');
 if (html.includes('<!-- PUPPY-ASSETS-BEGIN -->')) {
   html = html.replace(/<!-- PUPPY-ASSETS-BEGIN -->[\s\S]*?<!-- PUPPY-ASSETS-END -->/, block);
@@ -20,4 +26,4 @@ if (html.includes('<!-- PUPPY-ASSETS-BEGIN -->')) {
   html = html.slice(0, where) + block + '\n' + html.slice(where);
 }
 fs.writeFileSync(target, html);
-console.log(`Embedded puppy: ${assets.manifest.frames} frames; math.html ${Buffer.byteLength(html)} bytes`);
+console.log(`Embedded puppy: ${assets.manifest.frames}, cat: ${catAssets.manifest.frames} frames; math.html ${Buffer.byteLength(html)} bytes`);

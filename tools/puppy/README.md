@@ -1,7 +1,8 @@
 # 2.5D Tori puppy
 
 Tori uses the approved Blender puppy: cream fur, caramel ears and a mint bandana.
-The rabbit and all arithmetic/cookie mechanics remain in the original game code.
+Bora is a matching lavender cat (see `../cat/README.md`). All arithmetic and
+cookie mechanics remain in the original game code.
 
 The 96 transparent frames share one 2560×3840 WebP atlas (about 0.5 MB).
 The browser decodes it once and draws the visible character at 15 fps. Hidden
@@ -18,8 +19,8 @@ single file. There are no CDN requests, WebGL requirements or new dependencies.
 - `source.blend`: original editable puppy and studio lighting, Blender 5.2.
 - `render.py`: generate normal, happy, gentle wrong-answer, surprised and left/right glance clips.
 - `assets/`: shared atlas, poster, table paw and frame manifest.
-- `player.js`: canvas playback and visibility handling.
-- `embed.mjs`: re-embed the assets and player in `math.html`.
+- `player.js`: shared puppy/cat canvas playback and visibility handling.
+- `embed.mjs`: re-embed both characters' assets and player in `math.html`.
 
 ## Rebuild
 

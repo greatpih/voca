@@ -162,3 +162,11 @@ python3 tools/embed_font.py tools/fonts/Cafe24Ssurround.woff math.html
 
 블렌더 원본, 재생 코드, 이미지 원본과 재생성 방법은
 [`tools/puppy/README.md`](tools/puppy/README.md)에 있습니다.
+
+## 2.5D 고양이 보라
+
+보라도 토리와 같은 조명과 재질의 2.5D 고양이로 바뀌었습니다. 연보라색 귀와
+목수건, 수염, 긴 꼬리가 특징이며 시작·문제·완료 화면에 적용됩니다.
+뺄셈에서 쿠키를 받을 때 먹는 동작, 정답·오답·놀람과 시선 반응이 연결됩니다.
+두 캐릭터의 이미지와 동작은 모두 `math.html`에 들어 있습니다.
+블렌더 원본과 재생성 방법은 [`tools/cat/README.md`](tools/cat/README.md)에 있습니다.

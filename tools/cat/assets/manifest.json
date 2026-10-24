@@ -1,0 +1,43 @@
+{
+  "cell": 320,
+  "columns": 8,
+  "fps": 15,
+  "clips": {
+    "normal": {
+      "start": 0,
+      "count": 24
+    },
+    "happy": {
+      "start": 24,
+      "count": 20
+    },
+    "sad": {
+      "start": 44,
+      "count": 16
+    },
+    "wow": {
+      "start": 60,
+      "count": 12
+    },
+    "lookLeft": {
+      "start": 72,
+      "count": 12
+    },
+    "lookRight": {
+      "start": 84,
+      "count": 12
+    },
+    "eat": {
+      "start": 96,
+      "count": 16
+    }
+  },
+  "crop": [
+    44,
+    18,
+    232,
+    218
+  ],
+  "frames": 112,
+  "rows": 14
+}

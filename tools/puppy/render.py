@@ -8,10 +8,11 @@ from pathlib import Path
 from mathutils import Vector
 
 args=argparse.ArgumentParser();args.add_argument('--output-dir',required=True)
+args.add_argument('--source');args.add_argument('--character',choices=['puppy','cat'],default='puppy')
 opt=args.parse_args(sys.argv[sys.argv.index('--')+1:])
 OUT=Path(opt.output_dir).resolve();OUT.mkdir(parents=True,exist_ok=True)
 HERE=Path(__file__).resolve().parent
-record={'pid':os.getpid(),'executable':bpy.app.binary_path,'workingDirectory':str(Path.cwd()),'purpose':'Render transparent puppy animation assets','keepRunning':False}
+record={'pid':os.getpid(),'executable':bpy.app.binary_path,'workingDirectory':str(Path.cwd()),'purpose':'Render transparent '+opt.character+' animation assets','keepRunning':False}
 if os.name=='nt':
     class FT(ctypes.Structure):_fields_=[('lo',ctypes.c_uint32),('hi',ctypes.c_uint32)]
     k=ctypes.windll.kernel32;k.GetCurrentProcess.restype=ctypes.c_void_p;k.GetProcessTimes.argtypes=[ctypes.c_void_p]+[ctypes.POINTER(FT)]*4
@@ -19,9 +20,9 @@ if os.name=='nt':
     start=datetime.datetime(1601,1,1,tzinfo=datetime.timezone.utc)+datetime.timedelta(microseconds=((times[0].hi<<32)+times[0].lo)//10)
     record['startTime']=start.isoformat()
 (OUT/'render-process.json').write_text(json.dumps(record,indent=2))
-bpy.ops.wm.open_mainfile(filepath=str(HERE/'source.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(Path(opt.source).resolve() if opt.source else HERE/'source.blend'))
 scene=bpy.context.scene;scene.frame_set(1)
-root=bpy.data.objects['PUPPY / squash and jump'];head=bpy.data.objects['Head / curious tilt']
+root=bpy.data.objects['CAT / squash and jump' if opt.character=='cat' else 'PUPPY / squash and jump'];head=bpy.data.objects['Head / curious tilt']
 parts=[root]+list(root.children_recursive)
 for o in bpy.data.objects:
     o.animation_data_clear()
@@ -64,6 +65,7 @@ normal_mouth=[o for o in parts if o.name.startswith('Smile ') or o.name=='Philtr
 brows=[o for o in parts if o.name.startswith('Eyebrow ')]
 
 clips=[('normal',24),('happy',20),('sad',16),('wow',12),('lookLeft',12),('lookRight',12)]
+if opt.character=='cat':clips.append(('eat',16))
 manifest={'cell':320,'columns':8,'fps':15,'clips':{},'crop':[44,18,232,218]}
 (OUT/'frames').mkdir(exist_ok=True)
 frame=0
@@ -108,13 +110,25 @@ for mood,count in clips:
             for e in eyes:e.scale=(1.12,1,1.12)
             head.rotation_euler.x=-.035
             for b in brows:b.location.z=.055
+        elif mood=='eat':
+            for e in eyes:
+                for child in e.children:child.hide_render=True
+            for o in normal_mouth:o.hide_render=True
+            for o in closed+[mouth,tongue]:o.hide_render=False
+            chew=.5+.5*math.cos(u*math.tau*3)
+            head.rotation_euler.x=.025*math.sin(u*math.tau*3)
+            mouth.scale=(.09+.015*chew,.035,.035+.045*chew)
+            tongue.scale.z=.015+.018*chew
+            for name in ['Cheek volume L','Cheek volume R']:
+                bpy.data.objects[name].scale.x=poses[name][2].x*(1+.035*chew)
         else:
             direction=-1 if mood=='lookLeft' else 1
             head.rotation_euler.z=direction*.16
             head.rotation_euler.x=.07
             head.rotation_euler.y=direction*.025*wave
-        if mood!='wow':mouth.scale=(.125,.035,.105)
-        scene.render.filepath=str(OUT/'frames'/f'puppy-{frame:03d}.png');bpy.ops.render.render(write_still=True)
+        if mood not in ('wow','eat'):mouth.scale=(.125,.035,.105)
+        if mood!='eat':tongue.scale.z=.035
+        scene.render.filepath=str(OUT/'frames'/f'{opt.character}-{frame:03d}.png');bpy.ops.render.render(write_still=True)
         frame+=1
 
 # Table paw: the same cream material and soft studio lighting as the character.
@@ -130,4 +144,4 @@ scene.render.resolution_x=160;scene.render.resolution_y=96
 scene.render.filepath=str(OUT/'paw.png');bpy.ops.render.render(write_still=True)
 manifest['frames']=frame;manifest['rows']=math.ceil(frame/8)
 (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2))
-print('PUPPY_ASSETS_COMPLETE',flush=True)
+print(opt.character.upper()+'_ASSETS_COMPLETE',flush=True)
